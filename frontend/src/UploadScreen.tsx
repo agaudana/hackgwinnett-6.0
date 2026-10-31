@@ -86,29 +86,36 @@ export default function UploadScreen({ onSubmit }: { onSubmit: (input: AnalyzeIn
       <h1 id="upload-title">What paper do you have?</h1>
       <p className="lead">Take a picture of it. We will tell you what it means in simple words.</p>
 
-      <label className="btn btn-primary btn-huge">
-        {pickerInput(true)}
-        <Icon name="camera" className="huge-icon" />
-        Take a picture
-      </label>
-
-      <label
-        className={`btn btn-outline btn-big dropzone${dragging ? ' is-dragging' : ''}`}
+      <div
+        className={`capture-card${dragging ? ' is-dragging' : ''}`}
         onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
         onDragLeave={() => setDragging(false)}
         onDrop={(e) => { e.preventDefault(); setDragging(false); choose(e.dataTransfer.files?.[0]) }}
       >
-        {pickerInput(false)}
-        <Icon name="upload" />
-        Choose a picture
-      </label>
+        <label className="capture-main">
+          {pickerInput(true)}
+          <Icon name="camera" className="huge-icon" />
+          Take a picture
+        </label>
+        <label className="btn btn-outline btn-small capture-choose">
+          {pickerInput(false)}
+          <Icon name="upload" />
+          Choose a picture
+        </label>
+      </div>
 
       {problem && <p className="inline-error" role="alert">{problem}</p>}
 
-      <button className="btn btn-outline btn-big" onClick={() => setTyping(true)}>Type the words instead</button>
-      <button className="btn btn-outline btn-big btn-dashed" onClick={() => onSubmit({ kind: 'text', text: SAMPLE_TEXT })}>
-        Try an example paper
-      </button>
+      <div className="option-pair">
+        <button className="btn btn-outline btn-big btn-example" onClick={() => setTyping(true)}>
+          <Icon name="pencil" className="pair-icon" />
+          Type it out
+        </button>
+        <button className="btn btn-outline btn-big btn-dashed btn-example" onClick={() => onSubmit({ kind: 'text', text: SAMPLE_TEXT })}>
+          <img className="example-thumb" src="/sample-paper.svg" alt="" />
+          Try an example paper
+        </button>
+      </div>
 
       <div className="tips">
         <h2 className="tips-title">Tips for a good picture</h2>

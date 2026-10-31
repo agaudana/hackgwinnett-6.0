@@ -71,17 +71,19 @@ export default function App() {
   return (
     <div className="app">
       <header className="topbar">
-        <button className="brand" onClick={reset} aria-label="HealthLens, go to start">
-          <img
-            className="brand-logo"
-            src={prefs.theme === 'dark' ? '/logo/logo-horizontal-dark.svg' : '/logo/logo-horizontal.svg'}
-            alt=""
-          />
-        </button>
-        <div className="topbar-right">
+        <div className="topbar-row">
+          <button className="brand" onClick={reset} aria-label="HealthLens, go to start">
+            <img
+              className="brand-logo"
+              src={prefs.theme === 'dark' ? '/logo/logo-horizontal-dark.svg' : '/logo/logo-horizontal.svg'}
+              alt=""
+            />
+          </button>
           {demo && <span className="demo-badge">Demo mode</span>}
-          <button className="btn btn-outline btn-small settings-button" onClick={() => setOnboarding(true)}>
-            <Icon name="info" /> <span className="settings-label">How it works</span>
+        </div>
+        <div className="topbar-row">
+          <button className="btn btn-outline btn-small" onClick={() => setOnboarding(true)}>
+            <Icon name="info" /> Help
           </button>
           <button className="btn btn-outline btn-small settings-button" onClick={() => setSettingsOpen(true)}>
             <Icon name="sliders" /> <span className="settings-label">Reading settings</span>
