@@ -13,6 +13,18 @@ We are a team of 3 people, we're going to go ahead and build a working, ready-fo
 - Backend run/test commands: `cd backend && npm install && npm start` (runs on http://localhost:3000), tests with `npm test`
 - Approved AI model / endpoint for the app: OpenAI GPT-4 via Amazon Bedrock (if organizers enable), fallback to direct OpenAI API key purchased by integration owner. All AI calls server-side only.
 
+**Secondary feature: Care Schedule → Calendar** (build only AFTER the core demo flow works end-to-end)
+- Goal: From the same uploaded medical document, generate a plain-language care schedule (medication doses, follow-up appointments, refills, check-ins like "take temperature") that the user can add to Google Calendar or any calendar app
+- Flow: Analyze document → AI extracts dated/recurring tasks → "Your Schedule" view lists each item in plain language → user taps "Add to Google Calendar" (per item) or "Download calendar file" (all items)
+- Calendar approach (no OAuth, no Google API keys): 
+  - Google Calendar: per-event "add event" link (`https://calendar.google.com/calendar/render?action=TEMPLATE&text=...&dates=...&details=...&recur=RRULE:...`) opened in a new tab
+  - Everything else (Apple Calendar, Outlook, phone calendars): generate a standard `.ics` file client-side and download it; recurring meds use `RRULE` (e.g. `FREQ=DAILY;COUNT=20` for twice-daily × 10 days)
+  - Do NOT add Google sign-in / Calendar API write access — that's auth we don't need for the demo
+- Dates: AI returns relative timing ("twice daily for 10 days", "follow up in 7–10 days"); resolve against a start date the user confirms (default: today). Vague ranges become an all-day "Schedule your follow-up" reminder at the earliest date, not a fake appointment time
+- Safety: show a visible note that the schedule is a helper, not medical advice — confirm times with your doctor or pharmacist. Never invent doses or dates not in the document
+- Ownership: backend adds schedule extraction to the AI prompt and returns it; frontend owns the schedule screen and builds the Google links/.ics file. Requires an API_CONTRACT.md update (proposed: optional `schedule[]` field on the `POST /analyze` response) approved by the integration owner before either side implements it
+- Demo fallback: include a clearly labeled mock `schedule[]` for the sample discharge document so the calendar export can be demoed without live AI
+
 **Team ownership**
 - Frontend owner: frontend/ -- screens, components, styles, interactions, loading states, error states
 - Backend owner: backend/ -- routes, model calls, logic for the app, input checking, and tests
