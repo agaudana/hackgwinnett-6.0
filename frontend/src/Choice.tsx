@@ -6,6 +6,8 @@ export interface ChoiceOption<K extends keyof Preferences> {
   label: string
   /** Shows the option the way it will look once applied. */
   look?: CSSProperties
+  /** Optional sample line shown under the label with the same look. */
+  sample?: string
 }
 
 interface ChoiceProps<K extends keyof Preferences> {
@@ -30,7 +32,10 @@ export default function Choice<K extends keyof Preferences>({ legend, options, v
               checked={value === option.value}
               onChange={() => onChange(option.value)}
             />
-            <span className={option.look ? 'choice-look' : undefined} style={option.look}>{option.label}</span>
+            <span className={option.look ? 'choice-look' : undefined} style={option.look}>
+              {option.label}
+              {option.sample && <span className="choice-sample">{option.sample}</span>}
+            </span>
           </label>
         ))}
       </div>
@@ -51,9 +56,16 @@ export const SIZE_OPTIONS: ChoiceOption<'textSize'>[] = [
   { value: 'xl', label: 'Largest', look: { fontSize: 26 } },
 ]
 
+const SPACING_SAMPLE = 'Take one pill with food'
+
 export const SPACING_OPTIONS: ChoiceOption<'spacing'>[] = [
-  { value: 'normal', label: 'Normal', look: { lineHeight: 1.45, letterSpacing: 'normal', wordSpacing: 'normal' } },
-  { value: 'wide', label: 'Wide', look: { lineHeight: 1.8, letterSpacing: '0.03em', wordSpacing: '0.14em' } },
+  { value: 'normal', label: 'Normal', sample: SPACING_SAMPLE, look: { lineHeight: 1.45, letterSpacing: 'normal', wordSpacing: 'normal' } },
+  {
+    value: 'wide',
+    label: 'Wide',
+    sample: SPACING_SAMPLE,
+    look: { lineHeight: 'var(--wide-leading)', letterSpacing: 'var(--wide-tracking)', wordSpacing: 'var(--wide-word-gap)' },
+  },
 ]
 
 export const THEME_OPTIONS: ChoiceOption<'theme'>[] = [
