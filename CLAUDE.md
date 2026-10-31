@@ -5,13 +5,13 @@ We are a team of 3 people, we're going to go ahead and build a working, ready-fo
 
 **Project decisions**
 
-- Product/target user: TBD
-- One sentence problem: TBD
-- Single must-work demo flow: TBD
-- Stack: TBD
-- Frontend run/build commands: TBD
-- Backend run/test commands: TBD
-- Approved AI model / endpoint for the app: TBD
+- Product/target user: HealthLens - AI medical document explainer for cognitively disabled users, people with dyslexia, ESL patients, and anyone overwhelmed by medical jargon
+- One sentence problem: Critical healthcare information (discharge instructions, medical bills, prescription notes) is written in dense, inaccessible language that patients can't understand, leading to medication errors and missed follow-ups
+- Single must-work demo flow: User uploads photo of discharge instructions → App extracts text via OCR → AI simplifies to plain language with key actions highlighted → User can tap any medical term for simple explanation → "Read aloud" speaks full summary
+- Stack: Frontend (React + Vite), Backend (Node.js + Express), OCR (Tesseract.js or cloud API), AI (OpenAI via Bedrock if available, fallback to OpenAI direct)
+- Frontend run/build commands: `cd frontend && npm install && npm run dev` (runs on http://localhost:5173)
+- Backend run/test commands: `cd backend && npm install && npm start` (runs on http://localhost:3000), tests with `npm test`
+- Approved AI model / endpoint for the app: OpenAI GPT-4 via Amazon Bedrock (if organizers enable), fallback to direct OpenAI API key purchased by integration owner. All AI calls server-side only.
 
 **Team ownership**
 - Frontend owner: frontend/ -- screens, components, styles, interactions, loading states, error states
