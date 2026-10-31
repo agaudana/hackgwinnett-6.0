@@ -1,0 +1,19 @@
+EASTSIDE FAMILY MEDICINE - LAB REPORT (Reference Lab: Quanta Diagnostics)
+
+Patient: GREER, THOMAS     DOB: 01/22/1972     Fasting: YES
+Collected: 10/28/2026 08:45     Provider: P. Raman, MD
+
+HEMOGLOBIN A1c        8.4 %     H     Normal <5.7 | Prediabetes 5.7-6.4 | Diabetes >=6.5
+EST. AVG GLUCOSE      194 mg/dL
+
+LIPID PANEL
+Total Cholesterol     238       H     <200 mg/dL desirable
+Triglycerides         214       H     <150 mg/dL
+HDL Cholesterol       36        L     >40 mg/dL (men)
+LDL Cholesterol (calc) 159      H     <100 mg/dL (<70 if high risk)
+Non-HDL Cholesterol   202       H     <130 mg/dL
+Chol/HDL Ratio        6.6       H     <5.0
+
+URINE ALBUMIN/CREATININE RATIO    18 mg/g    Normal <30
+
+INTERPRETATION: Suboptimal glycemic control. Dyslipidemia with elevated LDL and triglycerides. Urine microalbumin negative. Consider statin therapy per ADA guidelines.

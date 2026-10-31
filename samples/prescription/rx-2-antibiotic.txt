@@ -1,0 +1,19 @@
+PHARMACY LABEL
+
+Rx# 8841533                          Fill Date: 10/26/2026
+Patient: DOE, MARIA L.
+Prescriber: J. Patel, MD             Pharmacy: MAPLE STREET PHARMACY  (555-0188)
+
+AMOXICILLIN-CLAVULANATE 875 MG/125 MG TABLET
+Qty: 10        Refills: 0
+
+SIG: Take 1 tablet by mouth every 12 hours with food for 5 days. Complete the entire course even if symptoms improve.
+
+WARNINGS:
+- Take at the start of a meal to reduce GI upset and enhance absorption.
+- May cause diarrhea. Contact prescriber if severe, watery, or bloody (possible C. difficile).
+- Allergy alert: Do not take if allergic to penicillins or cephalosporins. Stop and seek care for rash, hives, or difficulty breathing.
+- May decrease effectiveness of oral contraceptives.
+- Refrigeration not required. Store at room temperature, tightly closed.
+
+DISCARD any unused tablets after completing therapy.

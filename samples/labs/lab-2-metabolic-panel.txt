@@ -1,0 +1,18 @@
+NORTHGATE COMMUNITY HOSPITAL - LABORATORY
+BASIC METABOLIC PANEL (BMP)
+
+Patient: WASHINGTON, DELORES A.   DOB: 06/30/1950   MRN: 30918827
+Collected: 10/30/2026 08:10       Ordering: S. Brandt, MD
+
+TEST                  RESULT    FLAG    REFERENCE RANGE      UNITS
+Sodium                134       L       136 - 145            mmol/L
+Potassium             5.4       H       3.5 - 5.1            mmol/L
+Chloride              99                98 - 107             mmol/L
+CO2 (Bicarbonate)     24                22 - 29              mmol/L
+BUN                   34        H       7 - 20               mg/dL
+Creatinine            1.6       H       0.6 - 1.1            mg/dL
+eGFR                  34        L       >60                  mL/min/1.73m2
+Glucose               112       H       70 - 99 (fasting)    mg/dL
+Calcium               9.1               8.6 - 10.2           mg/dL
+
+COMMENT: Hyperkalemia and elevated creatinine, increased from baseline (Cr 1.2 on 10/23). Recommend review of ACE-I/ARB/MRA therapy and repeat BMP in 48-72h. Result called to Dr. Brandt's office at 09:02.

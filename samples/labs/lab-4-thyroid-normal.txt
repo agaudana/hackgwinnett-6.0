@@ -1,0 +1,16 @@
+SAINT CLARE UNIVERSITY HOSPITAL - OUTPATIENT LABORATORY
+THYROID PANEL & VITAMIN LEVELS
+
+Patient: NGUYEN, DANIEL K.     DOB: 11/09/1996     MRN: 55601234
+Collected: 10/15/2026 09:30    Ordering: L. Hoffman, NP
+
+TEST                      RESULT    FLAG    REFERENCE RANGE       UNITS
+TSH                       2.1               0.45 - 4.50           mIU/L
+Free T4                   1.2               0.82 - 1.77           ng/dL
+Vitamin D, 25-OH          18        L       30 - 100              ng/mL
+Vitamin B12               412               232 - 1245            pg/mL
+Ferritin                  58                30 - 400              ng/mL
+Folate                    9.8               >3.0                  ng/mL
+
+INTERPRETATION: Thyroid function within normal limits. Vitamin D insufficiency (deficiency range <20 ng/mL). Supplementation suggested; recheck 25-OH vitamin D in 12 weeks.
+All other values within reference range.

@@ -1,0 +1,24 @@
+BLUESHIELD PPO - EXPLANATION OF BENEFITS
+THIS IS NOT A BILL
+
+Member: Delores A. Washington     Member ID: XYZ884201937     Group #: 40018
+Claim #: 2026-CL-0094417          Date Processed: 11/02/2026
+Provider: Northgate Community Hospital (In-Network)
+Date of Service: 10/18/2026 - 10/23/2026
+
+Service                    Billed      Allowed     Plan Paid   You Owe   Remark
+Inpatient admission       $42,600.00  $18,450.00  $14,760.00  $3,690.00  A, C
+Cardiology consult         $  850.00  $   310.00  $   248.00  $   62.00  A
+Echocardiogram (TTE)      $ 2,200.00  $   780.00  $     0.00  $  780.00  B
+Lab - BNP, BMP            $  560.00  $   120.00  $    96.00  $   24.00  A
+TOTALS                    $46,210.00  $19,660.00  $15,104.00  $4,556.00
+
+REMARK CODES
+A - Applied to coinsurance; member responsible for 20% after deductible met.
+B - Applied to deductible. $780.00 of annual deductible satisfied.
+C - Amount over the allowed charge is a contractual write-off. You are not responsible for the difference ($24,150.00).
+
+YOUR YEAR-TO-DATE
+Deductible: $1,500 of $1,500 met    Out-of-pocket max: $4,556 of $6,000 met
+
+Do not pay this notice. Wait for a bill from your provider. To appeal, submit a written request within 180 days to: Appeals Dept, PO Box 0000.

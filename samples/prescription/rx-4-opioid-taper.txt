@@ -1,0 +1,20 @@
+PHARMACY LABEL  -  CII CONTROLLED SUBSTANCE
+
+Rx# 9902215                          Fill Date: 10/27/2026
+Patient: SMITH, ROBERT T.
+Prescriber: K. Okafor, MD            Pharmacy: HARBOR DRUG  (555-0123)
+
+OXYCODONE HCL 5 MG TABLET
+Qty: 28        Refills: 0 (no refills permitted)
+
+SIG: Take 1 tablet by mouth every 6 hours as needed for severe pain. Do not exceed 4 tablets in 24 hours.
+
+CAUTION: Federal law prohibits the transfer of this drug to any person other than the patient for whom it was prescribed.
+
+WARNINGS:
+- May cause drowsiness. Do not drive or operate machinery.
+- Do NOT drink alcohol. Do not combine with sleep aids, benzodiazepines, or other sedatives.
+- May cause constipation; use stool softener.
+- Risk of addiction, abuse, and misuse. Respiratory depression can be fatal.
+- Store securely, out of reach of children. Dispose of unused tablets via drug take-back program.
+- Naloxone nasal spray available upon request.

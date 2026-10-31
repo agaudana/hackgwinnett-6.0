@@ -1,0 +1,21 @@
+EASTSIDE FAMILY MEDICINE
+STATEMENT OF ACCOUNT
+
+Date: 11/01/2026        Patient: GREER, THOMAS        Acct: 100342
+Visit: 10/28/2026 w/ Dr. P. Raman
+
+CPT     Description                                 Charge
+99214   Office visit, est. patient, mod complexity   $ 245.00
+83036   Hemoglobin A1c                               $  62.00
+82947   Glucose, quantitative                        $  18.00
+36415   Venipuncture                                 $   9.00
+        Total Charges                                $ 334.00
+        Insurance Adjustment (Aetna HMO)            -$ 148.00
+        Insurance Paid                              -$ 156.00
+        Copay collected at visit                    -$  30.00
+        ------------------------------------------------
+        PATIENT BALANCE                              $   0.00
+
+Thank you. No payment is due at this time.
+Your next appointment: 01/27/2027 at 9:20 AM
+If you believe there is an error, call 555-0176.

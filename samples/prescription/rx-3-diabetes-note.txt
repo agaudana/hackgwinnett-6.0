@@ -1,0 +1,23 @@
+PRESCRIPTION NOTE - handwritten transcription
+
+Eastside Family Medicine
+Dr. Priya Raman, MD          Tel 555-0176
+
+Pt: Thomas Greer     DOB 01/22/1972     Date: 10/28/26
+
+Dx: T2DM, A1c 8.4% - not at goal
+
+Rx:
+  1. Metformin ER 500 mg tab
+     Sig: 1 tab PO qPM w/ dinner x 2 wks, then incr to 2 tabs qPM
+     Disp: #60   RF: 3
+  2. Glipizide 5 mg tab
+     Sig: 1 tab PO qAM 30 min ac breakfast. Hold if not eating.
+     Disp: #30   RF: 3
+  3. Glucometer + test strips, lancets
+     Check FBG daily and 2h pp prn. Log results.
+
+Counsel: s/s hypoglycemia (shaky, sweaty, confused) -> take 15 g fast carbs (4 oz juice), recheck in 15 min. GI side effects from metformin usually improve in 1-2 wks.
+Avoid EtOH excess. RTC 3 mo w/ labs (A1c, BMP, lipid).
+
+Signed: P. Raman MD

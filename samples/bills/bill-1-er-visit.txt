@@ -1,0 +1,29 @@
+RIVERBEND REGIONAL MEDICAL CENTER - PATIENT STATEMENT
+
+Statement Date: 11/05/2026       Account #: 7720-5518-03
+Patient: DOE, MARIA L.           Guarantor: DOE, MARIA L.
+Dates of Service: 10/22/2026 - 10/26/2026
+
+CHARGES
+Rev Code  Description                          Qty    Amount
+0120      Room & Board - Semi-Private           4     $ 6,800.00
+0250      Pharmacy                              --    $ 2,314.50
+0300      Laboratory - Clinical                 --    $ 1,980.00
+0324      Radiology - Chest X-ray               2     $   640.00
+0450      Emergency Room Level 4                1     $ 2,100.00
+0410      Respiratory Therapy                   --    $   915.00
+          TOTAL CHARGES                               $14,749.50
+
+ADJUSTMENTS
+Insurance Contractual Adjustment (BlueShield PPO)    -$ 9,920.30
+Insurance Payment                                    -$ 3,200.00
+          INSURANCE TOTAL                            -$13,120.30
+
+PATIENT RESPONSIBILITY
+Deductible applied                                    $ 1,000.00
+Coinsurance (20%)                                     $   629.20
+          BALANCE DUE                                 $ 1,629.20
+
+Payment due by: 12/05/2026
+Questions? Billing office 555-0150, Mon-Fri 8-5. Financial assistance may be available - ask for an application.
+Pay online: riverbend.example/pay

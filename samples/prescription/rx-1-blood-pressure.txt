@@ -1,0 +1,19 @@
+PHARMACY LABEL
+
+Rx# 8841207                          Fill Date: 10/30/2026
+Patient: DOE, MARIA L.
+Prescriber: Dr. A. Nguyen            Pharmacy: MAPLE STREET PHARMACY  (555-0188)
+
+LISINOPRIL 10 MG TABLET
+Qty: 30        Refills: 5
+
+SIG: Take 1 tablet by mouth once daily in the morning.
+
+WARNINGS:
+- May cause dizziness. Rise slowly from sitting/lying.
+- Do not use potassium supplements or salt substitutes without consulting your doctor.
+- Report facial/lip/tongue swelling (angioedema), persistent dry cough, or difficulty breathing.
+- Contraindicated in pregnancy. Avoid NSAIDs (e.g., ibuprofen) as they may reduce efficacy and impair renal function.
+- Do not discontinue abruptly.
+
+Discard after: 10/30/2027

@@ -1,0 +1,24 @@
+RIVERBEND REGIONAL MEDICAL CENTER
+DISCHARGE SUMMARY
+
+Patient: DOE, MARIA L.        MRN: 00482913        DOB: 03/14/1958
+Admit Date: 10/22/2026        Discharge Date: 10/26/2026
+Attending: J. Patel, MD       Service: Hospital Medicine
+
+PRINCIPAL DIAGNOSIS: Community-acquired pneumonia, right lower lobe, with acute hypoxic respiratory failure, resolved.
+SECONDARY DIAGNOSES: Essential hypertension; Type 2 diabetes mellitus without complications; Hyperlipidemia.
+
+HOSPITAL COURSE: 68 y/o F presented w/ 3-day hx of productive cough, pyrexia, and dyspnea on exertion. CXR demonstrated RLL consolidation. SpO2 88% on RA, improved to 95% on 2L NC. Initiated on IV ceftriaxone and azithromycin, transitioned to PO on HD#3. Afebrile >24h prior to discharge. Ambulating on RA with SpO2 94%.
+
+DISCHARGE MEDICATIONS:
+1. Amoxicillin-clavulanate 875/125 mg PO BID x 5 days (NEW)
+2. Azithromycin 250 mg PO QD x 2 more days (NEW)
+3. Lisinopril 10 mg PO QD (CONTINUE)
+4. Metformin 500 mg PO BID w/ meals (CONTINUE)
+5. Atorvastatin 20 mg PO QHS (CONTINUE)
+
+FOLLOW-UP: PCP (Dr. A. Nguyen) within 7 days. Repeat CXR in 6-8 weeks to document resolution.
+Return to ED for: worsening dyspnea, temp >101F, hemoptysis, chest pain, confusion, or inability to tolerate PO.
+DIET: Cardiac/diabetic. Maintain adequate PO hydration.
+ACTIVITY: As tolerated. Incentive spirometry q1h while awake.
+Smoking cessation: N/A (never smoker).

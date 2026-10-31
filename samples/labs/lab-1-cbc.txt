@@ -1,0 +1,20 @@
+RIVERBEND REGIONAL MEDICAL CENTER - LABORATORY
+COMPLETE BLOOD COUNT (CBC) w/ DIFFERENTIAL
+
+Patient: DOE, MARIA L.     DOB: 03/14/1958     MRN: 00482913
+Collected: 10/22/2026 14:05     Ordering: J. Patel, MD
+
+TEST                  RESULT    FLAG    REFERENCE RANGE      UNITS
+WBC                   15.8      H       4.0 - 11.0           x10^3/uL
+RBC                   4.21              3.90 - 5.20          x10^6/uL
+Hemoglobin            12.4              12.0 - 15.5          g/dL
+Hematocrit            37.1              36.0 - 46.0          %
+MCV                   88.1              80.0 - 100.0         fL
+Platelets             312               150 - 400            x10^3/uL
+Neutrophils           84        H       40 - 70              %
+Lymphocytes           9         L       20 - 45              %
+Monocytes             6                 2 - 10               %
+Bands                 8         H       0 - 5                %
+
+COMMENT: Leukocytosis with neutrophilia and left shift, consistent with acute bacterial infection. Clinical correlation recommended.
+H = High, L = Low
