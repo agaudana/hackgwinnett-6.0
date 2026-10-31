@@ -38,6 +38,7 @@ export type AnalyzeResult =
 
 export interface Preferences {
   textSize: 'md' | 'lg' | 'xl'
+  font: 'default' | 'dyslexic'
   spacing: 'normal' | 'wide'
   theme: 'yellow' | 'white' | 'dark'
   ruler: boolean

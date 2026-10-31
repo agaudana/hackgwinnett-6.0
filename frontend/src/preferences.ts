@@ -3,6 +3,7 @@ import type { Preferences } from './types'
 
 export const DEFAULT_PREFERENCES: Preferences = {
   textSize: 'md',
+  font: 'default',
   spacing: 'normal',
   theme: 'yellow',
   ruler: false,
@@ -29,6 +30,7 @@ export function usePreferences() {
     root.dataset.theme = prefs.theme
     root.dataset.size = prefs.textSize
     root.dataset.spacing = prefs.spacing
+    root.dataset.font = prefs.font
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', THEME_COLORS[prefs.theme])
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs))

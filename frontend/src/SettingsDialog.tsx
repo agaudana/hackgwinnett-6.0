@@ -1,36 +1,7 @@
-import { useEffect, useId, useRef } from 'react'
+import { useEffect, useRef } from 'react'
+import Choice, { FONT_OPTIONS, SIZE_OPTIONS, SPACING_OPTIONS, THEME_OPTIONS } from './Choice'
 import Icon from './Icon'
 import type { Preferences } from './types'
-
-interface ChoiceProps<K extends keyof Preferences> {
-  legend: string
-  options: { value: Preferences[K]; label: string }[]
-  value: Preferences[K]
-  onChange: (value: Preferences[K]) => void
-}
-
-function Choice<K extends keyof Preferences>({ legend, options, value, onChange }: ChoiceProps<K>) {
-  const name = useId()
-  return (
-    <fieldset className="choice">
-      <legend>{legend}</legend>
-      <div className="choice-row">
-        {options.map((option) => (
-          <label key={String(option.value)} className="choice-option">
-            <input
-              type="radio"
-              name={name}
-              className="visually-hidden"
-              checked={value === option.value}
-              onChange={() => onChange(option.value)}
-            />
-            <span>{option.label}</span>
-          </label>
-        ))}
-      </div>
-    </fieldset>
-  )
-}
 
 interface Props {
   open: boolean
@@ -65,19 +36,25 @@ export default function SettingsDialog({ open, prefs, onChange, onReset, onClose
           legend="Text size"
           value={prefs.textSize}
           onChange={(textSize) => onChange({ textSize })}
-          options={[{ value: 'md', label: 'Normal' }, { value: 'lg', label: 'Large' }, { value: 'xl', label: 'Largest' }]}
+          options={SIZE_OPTIONS}
+        />
+        <Choice<'font'>
+          legend="Font"
+          value={prefs.font}
+          onChange={(font) => onChange({ font })}
+          options={FONT_OPTIONS}
         />
         <Choice<'spacing'>
           legend="Space between letters and lines"
           value={prefs.spacing}
           onChange={(spacing) => onChange({ spacing })}
-          options={[{ value: 'normal', label: 'Normal' }, { value: 'wide', label: 'Wide' }]}
+          options={SPACING_OPTIONS}
         />
         <Choice<'theme'>
           legend="Colors"
           value={prefs.theme}
           onChange={(theme) => onChange({ theme })}
-          options={[{ value: 'yellow', label: 'Yellow' }, { value: 'white', label: 'White' }, { value: 'dark', label: 'Dark' }]}
+          options={THEME_OPTIONS}
         />
         <Choice<'speechRate'>
           legend="Reading voice speed"
