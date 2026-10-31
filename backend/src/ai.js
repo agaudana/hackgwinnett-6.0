@@ -25,7 +25,8 @@ export function createOpenAiModel(config, io = {}) {
         body: JSON.stringify({
           model: config.model,
           messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
-          response_format: { type: 'json_object' },
+          // No response_format: Bedrock gpt-oss accepts json_object but returns corrupted JSON with it.
+          // The prompt asks for JSON only and parseModelJson tolerates surrounding text.
         }),
         signal: AbortSignal.timeout(config.timeoutMs),
       });
