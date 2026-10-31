@@ -140,15 +140,15 @@ export default function UploadScreen({ onSubmit, onCheckPill }: Props) {
       <div className={`option-pair${pillMode ? ' option-single' : ''}`}>
         {pillMode ? (
           <button
-            className="btn btn-outline btn-big btn-dashed btn-example"
+            className="btn btn-outline btn-big btn-dashed btn-example btn-example-row"
             onClick={async () => {
               const example = await loadExamplePill()
               if (example) onCheckPill(example)
               else setProblem('The example pill could not load. Please try again.')
             }}
           >
-            <img className="example-thumb example-thumb-pill" src={EXAMPLE_PILL_URL} alt="" />
             Try an example pill
+            <img className="example-thumb example-thumb-pill" src={EXAMPLE_PILL_URL} alt="" />
           </button>
         ) : (
           <>
