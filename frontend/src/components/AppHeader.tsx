@@ -1,0 +1,39 @@
+import { useRef } from 'react'
+import { HeartPulse, Settings2 } from 'lucide-react'
+import { ReadingSettings } from './ReadingSettings'
+
+export function AppHeader({ onHome }: { onHome?: () => void }) {
+  const dialogRef = useRef<HTMLDialogElement>(null)
+
+  const brand = (
+    <span className="flex items-center gap-2">
+      <span className="flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+        <HeartPulse className="size-6" aria-hidden="true" />
+      </span>
+      <span className="text-xl font-bold tracking-tight">HealthLens</span>
+    </span>
+  )
+
+  return (
+    <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur">
+      <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3 md:px-8">
+        {onHome ? (
+          <button type="button" onClick={onHome} className="rounded-xl" aria-label="HealthLens, go back to start">
+            {brand}
+          </button>
+        ) : (
+          brand
+        )}
+        <button
+          type="button"
+          onClick={() => dialogRef.current?.showModal()}
+          className="flex min-h-12 items-center gap-2 rounded-xl border-2 border-border bg-surface px-4 font-bold text-foreground transition-colors hover:border-primary"
+        >
+          <Settings2 className="size-5 text-primary" aria-hidden="true" />
+          <span>Reading settings</span>
+        </button>
+      </div>
+      <ReadingSettings ref={dialogRef} />
+    </header>
+  )
+}
