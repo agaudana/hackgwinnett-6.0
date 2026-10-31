@@ -1,16 +1,17 @@
-import { MOCK_RESPONSE, MOCK_ERROR_TRIGGER } from './mock.js'
+import { MOCK_RESPONSE, MOCK_ERROR_TRIGGER } from './mock'
+import type { AnalysisData, AnalyzeInput, AnalyzeResult, ApiError } from './types'
 
 export const USE_MOCK = import.meta.env.VITE_USE_MOCK !== 'false'
 
 const MAX_BYTES = 10 * 1024 * 1024
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png']
 
-const NETWORK_ERROR = {
+const NETWORK_ERROR: ApiError = {
   code: 'NETWORK_ERROR',
   message: "We couldn't reach HealthLens. Check your internet and try again.",
 }
 
-export function checkImage(file) {
+export function checkImage(file: File): ApiError | null {
   if (!ACCEPTED_TYPES.includes(file.type)) {
     return { code: 'INVALID_IMAGE', message: "Please choose a JPEG or PNG photo. Other file types can't be read yet." }
   }
@@ -20,16 +21,17 @@ export function checkImage(file) {
   return null
 }
 
-function parseAnalysis(data) {
+function parseAnalysis(data: unknown): AnalysisData {
+  const d = (data ?? {}) as Partial<Record<keyof AnalysisData, unknown>>
   return {
-    originalText: String(data?.originalText ?? ''),
-    simplifiedText: String(data?.simplifiedText ?? ''),
-    keyActions: Array.isArray(data?.keyActions) ? data.keyActions : [],
-    medicalTerms: Array.isArray(data?.medicalTerms) ? data.medicalTerms : [],
+    originalText: String(d.originalText ?? ''),
+    simplifiedText: String(d.simplifiedText ?? ''),
+    keyActions: Array.isArray(d.keyActions) ? d.keyActions : [],
+    medicalTerms: Array.isArray(d.medicalTerms) ? d.medicalTerms : [],
   }
 }
 
-async function mockAnalyze(input) {
+async function mockAnalyze(input: AnalyzeInput): Promise<AnalyzeResult> {
   await new Promise((r) => setTimeout(r, 1800))
   if (input.kind === 'text' && input.text.trim().toLowerCase() === MOCK_ERROR_TRIGGER) {
     return { ok: false, error: { code: 'AI_PROCESSING_FAILED', message: 'Unable to simplify document at this time. Please try again' } }
@@ -39,10 +41,10 @@ async function mockAnalyze(input) {
   return { ok: true, data }
 }
 
-export async function analyze(input) {
+export async function analyze(input: AnalyzeInput): Promise<AnalyzeResult> {
   if (USE_MOCK) return mockAnalyze(input)
 
-  let request
+  let request: RequestInit
   if (input.kind === 'image') {
     const form = new FormData()
     form.append('image', input.file)
@@ -56,7 +58,7 @@ export async function analyze(input) {
     }
   }
 
-  let body
+  let body: { success?: boolean; data?: unknown; error?: Partial<ApiError> } | null
   try {
     const res = await fetch('/api/analyze', request)
     body = await res.json()
@@ -64,5 +66,6 @@ export async function analyze(input) {
     return { ok: false, error: NETWORK_ERROR }
   }
   if (body?.success) return { ok: true, data: parseAnalysis(body.data) }
-  return { ok: false, error: body?.error?.message ? body.error : NETWORK_ERROR }
+  const err = body?.error
+  return { ok: false, error: err?.message ? { code: String(err.code ?? 'UNKNOWN'), message: err.message } : NETWORK_ERROR }
 }

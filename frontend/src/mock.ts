@@ -1,10 +1,12 @@
 // Demo-mode response, copied from the success example in API_CONTRACT.md v1.0.
+import type { AnalysisData } from './types'
+
 export const SAMPLE_TEXT =
   'Patient should take amoxicillin 500mg PO BID with food. Monitor for fever >101°F. Return to ED if SOB worsens. Follow up with PCP in 7-10 days.'
 
 export const MOCK_ERROR_TRIGGER = 'error'
 
-export const MOCK_RESPONSE = {
+export const MOCK_RESPONSE: { success: true; data: AnalysisData } = {
   success: true,
   data: {
     originalText: SAMPLE_TEXT,

@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { segmentText } from './segmentText.js'
+import { segmentText } from './segmentText.ts'
 
 const terms = [
   { term: 'amoxicillin', definition: 'An antibiotic', category: 'medication' },

@@ -1,10 +1,18 @@
-const TIPS = {
+import type { ApiError } from './types'
+
+const TIPS: Record<string, string> = {
   OCR_FAILED: 'Tip: put the paper on a flat table, turn on a light, and hold the phone straight above it.',
   INVALID_IMAGE: 'Tip: take a new photo with your phone camera, or type the words instead.',
   FILE_TOO_LARGE: 'Tip: take a new photo instead of using a scan, or type the words instead.',
 }
 
-export default function ErrorScreen({ error, onRetry, onReset }) {
+interface Props {
+  error: ApiError
+  onRetry: () => void
+  onReset: () => void
+}
+
+export default function ErrorScreen({ error, onRetry, onReset }: Props) {
   return (
     <section className="stack center" aria-labelledby="error-title">
       <h1 id="error-title">We could not read that</h1>

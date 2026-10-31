@@ -1,18 +1,19 @@
 import { useRef, useState } from 'react'
-import { checkImage } from './api.js'
-import { SAMPLE_TEXT } from './mock.js'
-import Icon from './Icon.jsx'
+import { checkImage } from './api'
+import { SAMPLE_TEXT } from './mock'
+import Icon from './Icon'
+import type { AnalyzeInput } from './types'
 
-export default function UploadScreen({ onSubmit }) {
-  const [file, setFile] = useState(null)
-  const [previewUrl, setPreviewUrl] = useState(null)
-  const [problem, setProblem] = useState(null)
+export default function UploadScreen({ onSubmit }: { onSubmit: (input: AnalyzeInput) => void }) {
+  const [file, setFile] = useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [problem, setProblem] = useState<string | null>(null)
   const [typing, setTyping] = useState(false)
   const [text, setText] = useState('')
   const [dragging, setDragging] = useState(false)
-  const fileInput = useRef(null)
+  const fileInput = useRef<HTMLInputElement>(null)
 
-  function choose(picked) {
+  function choose(picked: File | undefined) {
     if (!picked) return
     const issue = checkImage(picked)
     setProblem(issue?.message ?? null)
@@ -29,7 +30,7 @@ export default function UploadScreen({ onSubmit }) {
     if (fileInput.current) fileInput.current.value = ''
   }
 
-  if (file) {
+  if (file && previewUrl) {
     return (
       <section className="stack" aria-labelledby="preview-title">
         <h1 id="preview-title">Is this your paper?</h1>

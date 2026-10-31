@@ -1,12 +1,21 @@
 import { useEffect, useRef } from 'react'
-import { CATEGORY_LABELS } from './display.js'
-import Icon from './Icon.jsx'
+import { CATEGORY_LABELS } from './display'
+import Icon from './Icon'
+import type { MedicalTerm } from './types'
+import type { Speech } from './useSpeech'
 
-export default function TermDialog({ term, speech, onClose }) {
-  const dialog = useRef(null)
+interface Props {
+  term: MedicalTerm | null
+  speech: Speech
+  onClose: () => void
+}
+
+export default function TermDialog({ term, speech, onClose }: Props) {
+  const dialog = useRef<HTMLDialogElement>(null)
 
   useEffect(() => {
     const el = dialog.current
+    if (!el) return
     if (term && !el.open) el.showModal()
     if (!term && el.open) el.close()
   }, [term])
@@ -19,7 +28,7 @@ export default function TermDialog({ term, speech, onClose }) {
       className="term-dialog"
       aria-labelledby="term-title"
       onClose={() => { if (speakingThis) speech.stop(); onClose() }}
-      onClick={(e) => e.target === dialog.current && dialog.current.close()}
+      onClick={(e) => { if (e.target === dialog.current) dialog.current.close() }}
     >
       {term && (
         <div className="term-body">
@@ -35,7 +44,7 @@ export default function TermDialog({ term, speech, onClose }) {
                 <Icon name={speakingThis ? 'stop' : 'sound'} /> {speakingThis ? 'Stop' : 'Hear it'}
               </button>
             )}
-            <button className="btn btn-dark btn-big" onClick={() => dialog.current.close()} autoFocus>
+            <button className="btn btn-dark btn-big" onClick={() => dialog.current?.close()} autoFocus>
               Got it
             </button>
           </div>

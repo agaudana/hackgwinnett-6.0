@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
+import type { AnalyzeInput } from './types'
 
 const STEPS = ['Reading your paper…', 'Putting it into plain words…', 'Finding what you need to do…']
 
-export default function LoadingScreen({ input }) {
+export default function LoadingScreen({ input }: { input: AnalyzeInput }) {
   const [step, setStep] = useState(input.kind === 'image' ? 0 : 1)
 
   useEffect(() => {

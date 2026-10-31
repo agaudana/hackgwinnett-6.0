@@ -1,14 +1,27 @@
 import { useReducer } from 'react'
-import { analyze, USE_MOCK } from './api.js'
-import UploadScreen from './UploadScreen.jsx'
-import LoadingScreen from './LoadingScreen.jsx'
-import ResultsScreen from './ResultsScreen.jsx'
-import ErrorScreen from './ErrorScreen.jsx'
-import Icon from './Icon.jsx'
+import { analyze, USE_MOCK } from './api'
+import UploadScreen from './UploadScreen'
+import LoadingScreen from './LoadingScreen'
+import ResultsScreen from './ResultsScreen'
+import ErrorScreen from './ErrorScreen'
+import Icon from './Icon'
+import type { AnalysisData, AnalyzeInput, ApiError } from './types'
 
-const initial = { status: 'idle' }
+type State =
+  | { status: 'idle' }
+  | { status: 'loading'; input: AnalyzeInput }
+  | { status: 'result'; input: AnalyzeInput; data: AnalysisData }
+  | { status: 'error'; input: AnalyzeInput; error: ApiError }
 
-function reducer(state, event) {
+type Event =
+  | { type: 'submit'; input: AnalyzeInput }
+  | { type: 'success'; data: AnalysisData }
+  | { type: 'failure'; error: ApiError }
+  | { type: 'reset' }
+
+const initial: State = { status: 'idle' }
+
+function reducer(state: State, event: Event): State {
   switch (event.type) {
     case 'submit':
       return { status: 'loading', input: event.input }
@@ -18,15 +31,13 @@ function reducer(state, event) {
       return state.status === 'loading' ? { status: 'error', input: state.input, error: event.error } : state
     case 'reset':
       return initial
-    default:
-      return state
   }
 }
 
 export default function App() {
   const [state, dispatch] = useReducer(reducer, initial)
 
-  async function submit(input) {
+  async function submit(input: AnalyzeInput) {
     dispatch({ type: 'submit', input })
     const result = await analyze(input)
     dispatch(result.ok ? { type: 'success', data: result.data } : { type: 'failure', error: result.error })

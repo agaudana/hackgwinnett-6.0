@@ -1,42 +1,52 @@
 import { useState } from 'react'
-import { CATEGORY_LABELS, PRIORITIES, priorityOf, sortActions } from './display.js'
-import { segmentText } from './segmentText.js'
-import { useSpeech } from './useSpeech.js'
-import Icon from './Icon.jsx'
-import TermDialog from './TermDialog.jsx'
+import { CATEGORY_LABELS, PRIORITIES, priorityOf, sortActions } from './display'
+import { segmentText } from './segmentText'
+import { useSpeech } from './useSpeech'
+import Icon from './Icon'
+import TermDialog from './TermDialog'
+import type { AnalysisData, KeyAction, MedicalTerm } from './types'
 
-function buildSteps(data) {
-  const steps = sortActions(data.keyActions).map((action) => ({ kind: 'action', action }))
+type Step = { kind: 'action'; action: KeyAction } | { kind: 'summary' } | { kind: 'terms' }
+
+function buildSteps(data: AnalysisData): Step[] {
+  const steps: Step[] = sortActions(data.keyActions).map((action): Step => ({ kind: 'action', action }))
   if (data.simplifiedText) steps.push({ kind: 'summary' })
   if (data.medicalTerms.length) steps.push({ kind: 'terms' })
   return steps
 }
 
-function spokenStep(step, data) {
+function spokenStep(step: Step, data: AnalysisData) {
   if (step.kind === 'action') return `${PRIORITIES[priorityOf(step.action)].label}. ${step.action.action}.`
   if (step.kind === 'summary') return `Your paper in plain words. ${data.simplifiedText}`
   return `Words from your paper. ${data.medicalTerms.map((t) => `${t.term} means ${t.definition}.`).join(' ')}`
 }
 
-function fullScript(steps, data) {
-  const actions = steps.filter((s) => s.kind === 'action')
+function fullScript(steps: Step[], data: AnalysisData) {
+  const actions = steps.filter((s): s is Extract<Step, { kind: 'action' }> => s.kind === 'action')
   const list = actions.map((s, i) => `Step ${i + 1}. ${s.action.action}.`).join(' ')
   return `${actions.length ? `Here is what you need to do. ${list} ` : ''}Here is your paper in plain words. ${data.simplifiedText}`
 }
 
-function TermText({ text, terms, onPick }) {
-  return segmentText(text, terms).map((part, i) =>
+interface TermTextProps {
+  text: string
+  terms: MedicalTerm[]
+  onPick: (term: MedicalTerm) => void
+}
+
+function TermText({ text, terms, onPick }: TermTextProps) {
+  const parts = segmentText(text, terms).map((part, i) =>
     part.term ? (
-      <button key={i} className="term" onClick={() => onPick(part.term)} aria-label={`${part.text}. Tap to learn what this means`}>
+      <button key={i} className="term" onClick={() => onPick(part.term!)} aria-label={`${part.text}. Tap to learn what this means`}>
         {part.text}
       </button>
     ) : (
       <span key={i}>{part.text}</span>
     ),
   )
+  return <>{parts}</>
 }
 
-function StepCard({ step, data, onPick }) {
+function StepCard({ step, data, onPick }: { step: Step; data: AnalysisData; onPick: (term: MedicalTerm) => void }) {
   if (step.kind === 'action') {
     const level = priorityOf(step.action)
     return (
@@ -79,10 +89,10 @@ function StepCard({ step, data, onPick }) {
   )
 }
 
-export default function ResultsScreen({ data, onReset }) {
+export default function ResultsScreen({ data, onReset }: { data: AnalysisData; onReset: () => void }) {
   const steps = buildSteps(data)
   const [index, setIndex] = useState(0)
-  const [openTerm, setOpenTerm] = useState(null)
+  const [openTerm, setOpenTerm] = useState<MedicalTerm | null>(null)
   const [showOriginal, setShowOriginal] = useState(false)
   const speech = useSpeech()
 
@@ -90,7 +100,7 @@ export default function ResultsScreen({ data, onReset }) {
   const isLast = index === steps.length - 1
   const actionCount = steps.filter((s) => s.kind === 'action').length
 
-  function go(next) {
+  function go(next: number) {
     speech.stop()
     setIndex(next)
   }

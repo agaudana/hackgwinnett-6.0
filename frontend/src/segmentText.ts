@@ -1,6 +1,13 @@
-const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+import type { MedicalTerm } from './types'
 
-export function segmentText(text, terms) {
+export interface TextPart {
+  text: string
+  term: MedicalTerm | null
+}
+
+const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+export function segmentText(text: string, terms: MedicalTerm[]): TextPart[] {
   const usable = terms.filter((t) => t.term && t.term.trim())
   if (!text || usable.length === 0) return [{ text: text ?? '', term: null }]
 
@@ -11,12 +18,13 @@ export function segmentText(text, terms) {
     .join('|')
   const pattern = new RegExp(`(?<![\\p{L}\\p{N}])(?:${alternatives})(?![\\p{L}\\p{N}])`, 'giu')
 
-  const parts = []
+  const parts: TextPart[] = []
   let last = 0
   for (const match of text.matchAll(pattern)) {
-    if (match.index > last) parts.push({ text: text.slice(last, match.index), term: null })
-    parts.push({ text: match[0], term: byLower.get(match[0].toLowerCase()) })
-    last = match.index + match[0].length
+    const start = match.index ?? 0
+    if (start > last) parts.push({ text: text.slice(last, start), term: null })
+    parts.push({ text: match[0], term: byLower.get(match[0].toLowerCase()) ?? null })
+    last = start + match[0].length
   }
   if (last < text.length) parts.push({ text: text.slice(last), term: null })
   return parts

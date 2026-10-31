@@ -1,4 +1,6 @@
-const PATHS = {
+import type { ReactNode } from 'react'
+
+const PATHS: Record<string, ReactNode> = {
   camera: <><path d="M4 8h3l2-3h6l2 3h3v11H4z" /><circle cx="12" cy="13" r="3.5" /></>,
   medication: <><rect x="3" y="8.5" width="18" height="7" rx="3.5" transform="rotate(-35 12 12)" /><path d="M9.2 7.9l5.6 8.2" /></>,
   thermometer: <><path d="M10 4a2 2 0 0 1 4 0v10a4 4 0 1 1-4 0z" /><path d="M12 9v7" /></>,
@@ -12,7 +14,7 @@ const PATHS = {
   lens: <><circle cx="10.5" cy="10.5" r="6" /><path d="M15 15l5 5" /></>,
 }
 
-export default function Icon({ name, className = '' }) {
+export default function Icon({ name, className = '' }: { name: string; className?: string }) {
   return (
     <svg className={`icon ${className}`} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
       {PATHS[name] ?? PATHS.check}
