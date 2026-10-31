@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { checkImage, loadExamplePill } from './api'
-import { SAMPLE_TEXT } from './mock'
+import { EXAMPLE_PILL_URL, SAMPLE_TEXT } from './mock'
 import Icon from './Icon'
 import type { AnalyzeInput, PillInput } from './types'
 
@@ -17,6 +17,8 @@ export default function UploadScreen({ onSubmit, onCheckPill }: Props) {
   const [text, setText] = useState('')
   const [dragging, setDragging] = useState(false)
   const [forPill, setForPill] = useState(false)
+  const [mode, setMode] = useState<'paper' | 'pill'>('paper')
+  const pillMode = mode === 'pill'
 
   function choose(picked: File | undefined, pill = false) {
     if (!picked) return
@@ -27,6 +29,11 @@ export default function UploadScreen({ onSubmit, onCheckPill }: Props) {
     setForPill(pill)
     setFile(picked)
     setPreviewUrl(URL.createObjectURL(picked))
+  }
+
+  function switchMode(next: 'paper' | 'pill') {
+    setProblem(null)
+    setMode(next)
   }
 
   function clearPhoto() {
@@ -88,14 +95,14 @@ export default function UploadScreen({ onSubmit, onCheckPill }: Props) {
     )
   }
 
-  const pickerInput = (capture: boolean, pill = false) => (
+  const pickerInput = (capture: boolean) => (
     <input
       type="file"
       accept="image/jpeg,image/png"
       {...(capture ? { capture: 'environment' as const } : {})}
       className="visually-hidden"
       onChange={(e) => {
-        choose(e.target.files?.[0], pill)
+        choose(e.target.files?.[0], pillMode)
         e.target.value = ''
       }}
     />
@@ -103,58 +110,74 @@ export default function UploadScreen({ onSubmit, onCheckPill }: Props) {
 
   return (
     <section className="stack" aria-labelledby="upload-title">
-      <h1 id="upload-title">What paper do you have?</h1>
-      <p className="lead">Take a picture of it. We will tell you what it means in simple words.</p>
+      <h1 id="upload-title">{pillMode ? 'What pill do you have?' : 'What paper do you have?'}</h1>
+      <p className="lead">
+        {pillMode
+          ? 'Take a picture of the pill or the medicine bottle. We will tell you what it is in simple words.'
+          : 'Take a picture of it. We will tell you what it means in simple words.'}
+      </p>
 
-      <label className="btn btn-primary btn-huge">
-        {pickerInput(true)}
-        <Icon name="camera" className="huge-icon" />
-        Take a picture
-      </label>
-
-      <label
-        className={`btn btn-outline btn-big dropzone${dragging ? ' is-dragging' : ''}`}
+      <div
+        className={`capture-card${dragging ? ' is-dragging' : ''}`}
         onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
         onDragLeave={() => setDragging(false)}
-        onDrop={(e) => { e.preventDefault(); setDragging(false); choose(e.dataTransfer.files?.[0]) }}
+        onDrop={(e) => { e.preventDefault(); setDragging(false); choose(e.dataTransfer.files?.[0], pillMode) }}
       >
-        {pickerInput(false)}
-        <Icon name="upload" />
-        Choose a picture
-      </label>
+        <label className="capture-main">
+          {pickerInput(true)}
+          <Icon name={pillMode ? 'medication' : 'camera'} className="huge-icon" />
+          Take a picture
+        </label>
+        <label className="btn btn-outline btn-small capture-choose">
+          {pickerInput(false)}
+          <Icon name="upload" />
+          Choose a picture
+        </label>
+      </div>
 
       {problem && <p className="inline-error" role="alert">{problem}</p>}
 
-      <label className="btn btn-outline btn-big pill-button">
-        {/* No capture: phones then offer both the camera and the photo library. */}
-        {pickerInput(false, true)}
-        <Icon name="medication" />
-        <span>
-          What is this pill?
-          <small>Take a picture of a pill or a medicine bottle</small>
-        </span>
-      </label>
+      <div className={`option-pair${pillMode ? ' option-single' : ''}`}>
+        {pillMode ? (
+          <button
+            className="btn btn-outline btn-big btn-dashed btn-example btn-example-row"
+            onClick={async () => {
+              const example = await loadExamplePill()
+              if (example) onCheckPill(example)
+              else setProblem('The example pill could not load. Please try again.')
+            }}
+          >
+            Try an example pill
+            <img className="example-thumb example-thumb-pill" src={EXAMPLE_PILL_URL} alt="" />
+          </button>
+        ) : (
+          <>
+            <button className="btn btn-outline btn-big btn-example" onClick={() => setTyping(true)}>
+              <Icon name="pencil" className="pair-icon" />
+              Type it out
+            </button>
+            <button className="btn btn-outline btn-big btn-dashed btn-example" onClick={() => onSubmit({ kind: 'text', text: SAMPLE_TEXT })}>
+              <img className="example-thumb" src="/sample-paper.svg" alt="" />
+              Try an example paper
+            </button>
+          </>
+        )}
+      </div>
 
-      <button className="btn btn-outline btn-big" onClick={() => setTyping(true)}>Type the words instead</button>
-      <button className="btn btn-outline btn-big btn-dashed" onClick={() => onSubmit({ kind: 'text', text: SAMPLE_TEXT })}>
-        Try an example paper
-      </button>
-      <button
-        className="btn btn-outline btn-big btn-dashed"
-        onClick={async () => {
-          const example = await loadExamplePill()
-          if (example) onCheckPill(example)
-          else setProblem('The example pill could not load. Please try again.')
-        }}
-      >
-        Try an example pill
+      <button className="btn btn-outline btn-big" onClick={() => switchMode(pillMode ? 'paper' : 'pill')}>
+        <Icon name={pillMode ? 'paper' : 'medication'} />
+        {pillMode ? 'Check a paper instead' : 'Check a pill instead'}
       </button>
 
       <div className="tips">
-        <h2 className="tips-title">Tips for a good picture</h2>
+        <h2 className="tips-title">{pillMode ? 'Tips for a good pill picture' : 'Tips for a good picture'}</h2>
         <ul>
           <li><Icon name="sun" /> Use bright light with no shadows.</li>
-          <li><Icon name="paper" /> Lay the paper flat and fit all of it in.</li>
+          {pillMode ? (
+            <li><Icon name="medication" /> Put the pill on a plain flat surface, or show the bottle label.</li>
+          ) : (
+            <li><Icon name="paper" /> Lay the paper flat and fit all of it in.</li>
+          )}
           <li><Icon name="sound" /> You can listen to every answer.</li>
         </ul>
       </div>

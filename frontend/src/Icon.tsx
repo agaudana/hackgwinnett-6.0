@@ -22,6 +22,7 @@ const PATHS: Record<string, ReactNode> = {
   sliders: <><path d="M4 7h10M18 7h2M4 17h4M12 17h8" /><circle cx="16" cy="7" r="2" /><circle cx="10" cy="17" r="2" /></>,
   print: <><path d="M7 9V3h10v6M7 17H4v-7h16v7h-3M7 14h10v7H7z" /></>,
   close: <path d="M6 6l12 12M18 6L6 18" />,
+  pencil: <><path d="M4 20l1-5L16 4l4 4L9 19z" /><path d="M14 6l4 4" /></>,
   tick: <path d="M5 12.5l4.5 4.5L19 7.5" />,
 }
 
