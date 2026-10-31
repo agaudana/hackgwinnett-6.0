@@ -1,4 +1,4 @@
-import type { AnalysisData } from './types'
+import type { AnalysisData, PillData } from './types'
 
 export const SAMPLE_DOCUMENT_TEXT =
   'Patient should take amoxicillin 500mg PO BID with food. Monitor for fever >101°F. Return to ED if SOB worsens. Follow up with PCP in 7-10 days.'
@@ -20,4 +20,18 @@ export const SAMPLE_ANALYSIS: AnalysisData = {
     { term: 'PCP', definition: 'Primary Care Provider - your regular doctor', category: 'provider' },
     { term: 'ED', definition: 'Emergency Department - the emergency room at a hospital', category: 'provider' },
   ],
+}
+
+export const SAMPLE_PILL: PillData = {
+  identified: true,
+  kind: 'bottle',
+  medicationName: 'Lisinopril',
+  strength: '10 mg',
+  purpose: 'This medicine lowers blood pressure. It helps protect your heart and kidneys.',
+  howToTake: 'Take 1 pill by mouth every morning.',
+  appearance: 'Orange pill bottle with a white label. The pills are small, round, and pink.',
+  imprint: '',
+  warnings: ['It may make you dizzy. Stand up slowly.', 'Tell your doctor if you get a dry cough or swelling in your face.'],
+  confidence: 'high',
+  summary: 'This is lisinopril, 10 mg. It lowers blood pressure. Take 1 pill by mouth every morning.',
 }

@@ -4,10 +4,12 @@ export function ErrorScreen({
   message,
   onRetry,
   onStartOver,
+  startOverLabel = 'Use a different paper',
 }: {
   message: string
   onRetry: () => void
   onStartOver: () => void
+  startOverLabel?: string
 }) {
   return (
     <div className="mx-auto flex w-full max-w-xl flex-1 flex-col items-center justify-center gap-6 px-4 py-10 text-center">
@@ -32,7 +34,7 @@ export function ErrorScreen({
           onClick={onStartOver}
           className="min-h-14 rounded-xl border-2 border-border bg-surface px-6 text-lg font-bold hover:border-primary"
         >
-          Use a different paper
+          {startOverLabel}
         </button>
       </div>
     </div>

@@ -39,3 +39,26 @@ export interface AnalysisResult {
   data: AnalysisData
   source: 'live' | 'sample'
 }
+
+// POST /api/identify (API_CONTRACT.md v1.1)
+
+export type PillConfidence = 'high' | 'medium' | 'low'
+
+export interface PillData {
+  identified: boolean
+  kind: 'bottle' | 'pill' | 'unknown'
+  medicationName: string
+  strength: string
+  purpose: string
+  howToTake: string
+  appearance: string
+  imprint: string
+  warnings: string[]
+  confidence: PillConfidence
+  summary: string
+}
+
+export interface PillResult {
+  data: PillData
+  source: 'live' | 'sample'
+}

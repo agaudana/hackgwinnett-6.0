@@ -2,23 +2,27 @@ import { useEffect, useState } from 'react'
 import { Check, FileText } from 'lucide-react'
 import type { AnalyzeInput } from '../lib/types'
 
-const STEPS = ['Reading your paper', 'Finding hard words', 'Writing simple steps']
+const DOCUMENT_STEPS = ['Reading your paper', 'Finding hard words', 'Writing simple steps']
 
 export function ProcessingScreen({
   previewUrl,
   input,
   onCancel,
+  title = 'Making it simple',
+  steps: STEPS = DOCUMENT_STEPS,
 }: {
   previewUrl: string | null
   input: AnalyzeInput
   onCancel: () => void
+  title?: string
+  steps?: string[]
 }) {
   const [step, setStep] = useState(0)
 
   useEffect(() => {
     const timer = setInterval(() => setStep((s) => Math.min(s + 1, STEPS.length - 1)), 1100)
     return () => clearInterval(timer)
-  }, [])
+  }, [STEPS.length])
 
   return (
     <div className="mx-auto flex w-full max-w-xl flex-1 flex-col items-center justify-center gap-10 px-4 py-10 text-center">
@@ -37,7 +41,7 @@ export function ProcessingScreen({
       </div>
 
       <div className="flex flex-col gap-3">
-        <h1 className="text-3xl font-bold">Making it simple</h1>
+        <h1 className="text-3xl font-bold">{title}</h1>
         <p className="reading text-lg text-muted-foreground">This takes a few seconds. You do not need to do anything.</p>
       </div>
 

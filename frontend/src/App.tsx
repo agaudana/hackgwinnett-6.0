@@ -3,18 +3,24 @@ import { AppHeader } from './components/AppHeader'
 import { ReadingRuler } from './components/ReadingRuler'
 import { ErrorScreen } from './screens/ErrorScreen'
 import { ProcessingScreen } from './screens/ProcessingScreen'
+import { PillResultsScreen } from './screens/PillResultsScreen'
 import { ResultsScreen } from './screens/ResultsScreen'
 import { UploadScreen } from './screens/UploadScreen'
-import { AnalyzeError, analyzeDocument } from './lib/api'
+import { AnalyzeError, analyzeDocument, identifyPill } from './lib/api'
 import { usePreferences } from './lib/preferences'
 import { useSpeech } from './lib/speech'
-import type { AnalysisResult, AnalyzeInput } from './lib/types'
+import type { AnalysisResult, AnalyzeInput, PillResult } from './lib/types'
+
+const PILL_STEPS = ['Looking at your photo', 'Reading the label or pill', 'Writing it in simple words']
 
 type View =
   | { name: 'upload' }
   | { name: 'processing'; input: AnalyzeInput; previewUrl: string | null }
   | { name: 'results'; result: AnalysisResult; previewUrl: string | null }
   | { name: 'error'; message: string; input: AnalyzeInput }
+  | { name: 'pill-processing'; file: File; previewUrl: string }
+  | { name: 'pill-results'; result: PillResult; previewUrl: string }
+  | { name: 'pill-error'; message: string; file: File }
 
 export default function App() {
   const [view, setView] = useState<View>({ name: 'upload' })
@@ -23,7 +29,10 @@ export default function App() {
   const { prefs } = usePreferences()
   const { stop } = useSpeech()
 
-  const previewUrl = view.name === 'processing' || view.name === 'results' ? view.previewUrl : null
+  const previewUrl =
+    view.name === 'processing' || view.name === 'results' || view.name === 'pill-processing' || view.name === 'pill-results'
+      ? view.previewUrl
+      : null
   useEffect(() => {
     if (!previewUrl) return
     return () => URL.revokeObjectURL(previewUrl)
@@ -54,6 +63,25 @@ export default function App() {
     }
   }, [])
 
+  const checkPill = useCallback(async (file: File) => {
+    controller.current?.abort()
+    const abort = new AbortController()
+    controller.current = abort
+    const preview = URL.createObjectURL(file)
+    setView({ name: 'pill-processing', file, previewUrl: preview })
+
+    try {
+      const result = await identifyPill(file, abort.signal)
+      if (abort.signal.aborted) return
+      setView({ name: 'pill-results', result, previewUrl: preview })
+    } catch (error) {
+      if (abort.signal.aborted) return
+      const message =
+        error instanceof AnalyzeError ? error.message : 'Something went wrong while checking your photo. Please try again.'
+      setView({ name: 'pill-error', message, file })
+    }
+  }, [])
+
   const reset = useCallback(() => {
     controller.current?.abort()
     setView({ name: 'upload' })
@@ -69,7 +97,7 @@ export default function App() {
       </a>
       <AppHeader onHome={view.name === 'upload' ? undefined : reset} />
       <main id="main" ref={mainRef} tabIndex={-1} className="flex flex-1 flex-col outline-none">
-        {view.name === 'upload' && <UploadScreen onAnalyze={analyze} />}
+        {view.name === 'upload' && <UploadScreen onAnalyze={analyze} onIdentifyPill={checkPill} />}
         {view.name === 'processing' && (
           <ProcessingScreen previewUrl={view.previewUrl} input={view.input} onCancel={reset} />
         )}
@@ -78,6 +106,26 @@ export default function App() {
         )}
         {view.name === 'error' && (
           <ErrorScreen message={view.message} onRetry={() => analyze(view.input)} onStartOver={reset} />
+        )}
+        {view.name === 'pill-processing' && (
+          <ProcessingScreen
+            previewUrl={view.previewUrl}
+            input={{ kind: 'image', file: view.file }}
+            onCancel={reset}
+            title="Checking your pill"
+            steps={PILL_STEPS}
+          />
+        )}
+        {view.name === 'pill-results' && (
+          <PillResultsScreen result={view.result} previewUrl={view.previewUrl} onCheckAnother={checkPill} onStartOver={reset} />
+        )}
+        {view.name === 'pill-error' && (
+          <ErrorScreen
+            message={view.message}
+            onRetry={() => checkPill(view.file)}
+            onStartOver={reset}
+            startOverLabel="Use a different photo"
+          />
         )}
       </main>
       {prefs.ruler && <ReadingRuler />}

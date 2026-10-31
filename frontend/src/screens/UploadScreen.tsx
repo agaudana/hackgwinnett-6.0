@@ -1,5 +1,5 @@
 import { useRef, useState, type DragEvent } from 'react'
-import { Camera, CircleAlert, FileText, Keyboard, Lightbulb, Sun, Upload, Volume2 } from 'lucide-react'
+import { Camera, ChevronRight, CircleAlert, FileText, Keyboard, Lightbulb, Pill, Sun, Upload, Volume2 } from 'lucide-react'
 import { validateImage } from '../lib/api'
 import { SAMPLE_DOCUMENT_TEXT } from '../lib/mock'
 import type { AnalyzeInput } from '../lib/types'
@@ -10,8 +10,15 @@ const TIPS = [
   { icon: Volume2, text: 'You can listen to every answer.' },
 ]
 
-export function UploadScreen({ onAnalyze }: { onAnalyze: (input: AnalyzeInput) => void }) {
+export function UploadScreen({
+  onAnalyze,
+  onIdentifyPill,
+}: {
+  onAnalyze: (input: AnalyzeInput) => void
+  onIdentifyPill: (file: File) => void
+}) {
   const cameraInput = useRef<HTMLInputElement>(null)
+  const pillInput = useRef<HTMLInputElement>(null)
   const fileInput = useRef<HTMLInputElement>(null)
   const [error, setError] = useState<string | null>(null)
   const [dragging, setDragging] = useState(false)
@@ -27,6 +34,17 @@ export function UploadScreen({ onAnalyze }: { onAnalyze: (input: AnalyzeInput) =
     }
     setError(null)
     onAnalyze({ kind: 'image', file })
+  }
+
+  const handlePill = (file: File | undefined) => {
+    if (!file) return
+    const invalid = validateImage(file)
+    if (invalid) {
+      setError(invalid.message)
+      return
+    }
+    setError(null)
+    onIdentifyPill(file)
   }
 
   const onDrop = (event: DragEvent<HTMLDivElement>) => {
@@ -81,6 +99,33 @@ export function UploadScreen({ onAnalyze }: { onAnalyze: (input: AnalyzeInput) =
           </button>
         </div>
 
+        <button
+          type="button"
+          onClick={() => pillInput.current?.click()}
+          className="lift flex min-h-24 items-center gap-5 rounded-2xl border-2 border-border bg-surface p-5 text-left text-foreground hover:border-primary md:p-6"
+        >
+          <span className="flex size-16 shrink-0 items-center justify-center rounded-full bg-surface-muted text-primary">
+            <Pill className="size-8" aria-hidden="true" />
+          </span>
+          <span className="flex min-w-0 flex-1 flex-col gap-1">
+            <span className="text-2xl font-bold">What is this pill?</span>
+            <span className="text-base text-muted-foreground">Take a photo of a pill or a medicine bottle. We will tell you what it is.</span>
+          </span>
+          <ChevronRight className="size-8 shrink-0 text-primary" aria-hidden="true" />
+        </button>
+
+        <input
+          ref={pillInput}
+          type="file"
+          accept="image/jpeg,image/png"
+          className="sr-only"
+          tabIndex={-1}
+          aria-hidden="true"
+          onChange={(event) => {
+            handlePill(event.target.files?.[0])
+            event.target.value = ''
+          }}
+        />
         <input
           ref={cameraInput}
           type="file"

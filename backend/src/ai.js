@@ -73,3 +73,69 @@ export function createMockModel() {
     },
   };
 }
+
+// --- vision (pill identification) ----------------------------------------
+
+/** @typedef {import('./identify.js').VisionPort} VisionPort */
+
+/**
+ * Amazon Bedrock Converse API with a Bedrock API key (Bearer auth), for vision-capable
+ * models such as Claude. gpt-oss on Bedrock's OpenAI endpoint is text-only, hence a second adapter.
+ * @param {{ apiKey: string, runtimeURL: string, model: string, timeoutMs: number }} config
+ * @param {{ fetch?: typeof fetch }} [io] injectable for offline tests
+ * @returns {VisionPort}
+ */
+export function createBedrockVisionModel(config, io = {}) {
+  const doFetch = io.fetch ?? globalThis.fetch;
+  return {
+    mode: 'live',
+    async see({ system, user, image }) {
+      const res = await doFetch(`${config.runtimeURL}/model/${encodeURIComponent(config.model)}/converse`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${config.apiKey}` },
+        body: JSON.stringify({
+          system: [{ text: system }],
+          messages: [{
+            role: 'user',
+            content: [{ image: { format: image.format, source: { bytes: image.buffer.toString('base64') } } }, { text: user }],
+          }],
+          inferenceConfig: { maxTokens: 1200 },
+        }),
+        signal: AbortSignal.timeout(config.timeoutMs),
+      });
+      if (!res.ok) {
+        const detail = (await res.text().catch(() => '')).slice(0, 200);
+        throw new Error(`Vision HTTP ${res.status}: ${detail}`);
+      }
+      const json = await res.json();
+      const content = (json?.output?.message?.content ?? []).map((part) => part?.text ?? '').join('');
+      if (!content.trim()) throw new Error('Vision model returned no content');
+      return content;
+    },
+  };
+}
+
+const MOCK_PILL_REPLY = Object.freeze({
+  kind: 'bottle',
+  medicationName: 'Lisinopril',
+  strength: '10 mg',
+  purpose: 'This medicine lowers blood pressure. It helps protect your heart and kidneys.',
+  howToTake: 'Take 1 pill by mouth every morning.',
+  appearance: 'Orange pill bottle with a white label. The pills are small, round, and pink.',
+  imprint: '',
+  warnings: ['It may make you dizzy. Stand up slowly.', 'Tell your doctor if you get a dry cough or swelling in your face.'],
+  confidence: 'high',
+  summary:
+    'DEMO MODE: no AI key is set, so this is a sample answer, not based on your photo. ' +
+    'This is lisinopril, 10 mg. It lowers blood pressure. Take 1 pill by mouth every morning.',
+});
+
+/** @returns {VisionPort} */
+export function createMockVisionModel() {
+  return {
+    mode: 'mock',
+    async see() {
+      return JSON.stringify(MOCK_PILL_REPLY);
+    },
+  };
+}
