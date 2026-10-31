@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { Timer } from "lucide-react";
+import { FlowSteps, type Screen } from "@/components/flow-steps";
 import { LoadingSteps } from "@/components/loading-steps";
 import { QuizView } from "@/components/quiz-view";
 import { StudyForm } from "@/components/study-form";
@@ -8,8 +10,6 @@ import { StudyPlanView } from "@/components/study-plan-view";
 import { Badge } from "@/components/ui/badge";
 import { ApiError, USE_MOCK, createStudyPlan } from "@/lib/api";
 import type { StudyPlanRequest, StudyPlanResponse } from "@/lib/types";
-
-type Screen = "form" | "plan" | "quiz";
 
 export default function Home() {
   const [screen, setScreen] = useState<Screen>("form");
@@ -19,6 +19,12 @@ export default function Home() {
   const [plan, setPlan] = useState<StudyPlanResponse | null>(null);
   // Kept here so ticked tasks survive switching between the plan and the quiz.
   const [doneTasks, setDoneTasks] = useState<Set<string>>(new Set());
+  const topRef = useRef<HTMLDivElement>(null);
+
+  function go(next: Screen) {
+    setScreen(next);
+    topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
   async function handleSubmit(req: StudyPlanRequest) {
     setLoading(true);
@@ -27,7 +33,7 @@ export default function Home() {
     try {
       setPlan(await createStudyPlan(req));
       setDoneTasks(new Set());
-      setScreen("plan");
+      go("plan");
     } catch (e) {
       const err = e instanceof ApiError ? e : new ApiError("INTERNAL_ERROR", "Something went wrong. Please try again.");
       setError({ message: err.message, field: err.field });
@@ -48,23 +54,32 @@ export default function Home() {
   function startOver() {
     setPlan(null);
     setError(null);
-    setScreen("form");
+    go("form");
   }
 
   return (
-    <div className="min-h-dvh bg-gradient-to-b from-violet-100 via-background to-pink-50">
-      <div className="mx-auto max-w-3xl px-4 pt-8 pb-16">
-        <header className="mb-6 flex flex-wrap items-center gap-3">
-          <span className="grid size-12 place-items-center rounded-2xl bg-primary text-2xl shadow-md" aria-hidden>🚀</span>
-          <div className="flex-1">
-            <h1 className="font-heading text-3xl font-semibold text-primary">StudySprint</h1>
-            <p className="text-muted-foreground">Turn the time you have into a plan that works.</p>
+    <div className="min-h-dvh bg-background" ref={topRef}>
+      <div className="mx-auto flex max-w-3xl flex-col gap-6 px-4 pt-6 pb-16 sm:pt-10">
+        <header className="flex flex-col gap-5">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="grid size-11 place-items-center rounded-xl bg-primary text-primary-foreground" aria-hidden>
+              <Timer className="size-6" />
+            </span>
+            <div className="flex-1">
+              <h1 className="font-heading text-2xl leading-tight font-semibold">StudySprint</h1>
+              <p className="text-sm text-muted-foreground">Turn the time you have into a plan that works.</p>
+            </div>
+            {USE_MOCK && (
+              <Badge
+                variant="outline"
+                className="h-7 border-highlight-foreground/30 bg-highlight px-3 text-sm text-highlight-foreground"
+                title="Responses are sample data, not AI-generated"
+              >
+                Demo mode: sample data
+              </Badge>
+            )}
           </div>
-          {USE_MOCK && (
-            <Badge variant="outline" className="border-amber-300 bg-amber-50 text-amber-900" title="Responses are sample data, not AI-generated">
-              Demo mode: sample data
-            </Badge>
-          )}
+          <FlowSteps current={screen} />
         </header>
 
         <main>
@@ -79,12 +94,12 @@ export default function Home() {
               plan={plan}
               doneTasks={doneTasks}
               onToggleTask={toggleTask}
-              onStartQuiz={() => setScreen("quiz")}
+              onStartQuiz={() => go("quiz")}
               onStartOver={startOver}
             />
           )}
           {screen === "quiz" && plan && (
-            <QuizView quiz={plan.quiz} onBackToPlan={() => setScreen("plan")} onStartOver={startOver} />
+            <QuizView quiz={plan.quiz} onBackToPlan={() => go("plan")} onStartOver={startOver} />
           )}
         </main>
       </div>

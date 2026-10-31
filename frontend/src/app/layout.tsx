@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
-import { Fredoka, Geist, Geist_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Fredoka, Geist } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -12,14 +12,16 @@ const fredoka = Fredoka({
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 export const metadata: Metadata = {
-  title: "StudySprint",
-  description: "Turn the time you have into a study plan and practice quiz.",
+  title: "StudySprint — Your study plan in seconds",
+  description:
+    "Enter your subject, test topic, and how much time you have. StudySprint builds a focused study plan and a short practice quiz.",
+};
+
+export const viewport: Viewport = {
+  themeColor: "#f5f8fa",
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
@@ -28,7 +30,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${fredoka.variable}`}>
+    <html lang="en" className={`${geistSans.variable} ${fredoka.variable} bg-background`}>
       <body className="antialiased">{children}</body>
     </html>
   );
