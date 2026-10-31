@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import Choice from './Choice'
+import Choice, { FONT_OPTIONS, SIZE_OPTIONS, SPACING_OPTIONS, THEME_OPTIONS } from './Choice'
 import Icon from './Icon'
 import type { Preferences } from './types'
 
@@ -72,25 +72,25 @@ export default function Onboarding({ prefs, onChange, onFinish }: Props) {
             legend="Font"
             value={prefs.font}
             onChange={(font) => onChange({ font })}
-            options={[{ value: 'default', label: 'Standard' }, { value: 'dyslexic', label: 'OpenDyslexic' }]}
+            options={FONT_OPTIONS}
           />
           <Choice<'textSize'>
             legend="Text size"
             value={prefs.textSize}
             onChange={(textSize) => onChange({ textSize })}
-            options={[{ value: 'md', label: 'Normal' }, { value: 'lg', label: 'Large' }, { value: 'xl', label: 'Largest' }]}
+            options={SIZE_OPTIONS}
           />
           <Choice<'spacing'>
             legend="Space between letters and lines"
             value={prefs.spacing}
             onChange={(spacing) => onChange({ spacing })}
-            options={[{ value: 'normal', label: 'Normal' }, { value: 'wide', label: 'Wide' }]}
+            options={SPACING_OPTIONS}
           />
           <Choice<'theme'>
             legend="Colors"
             value={prefs.theme}
             onChange={(theme) => onChange({ theme })}
-            options={[{ value: 'yellow', label: 'Yellow' }, { value: 'white', label: 'White' }, { value: 'dark', label: 'Dark' }]}
+            options={THEME_OPTIONS}
           />
           <div className="tip" aria-label="Preview">
             <p className="hint">Preview</p>

@@ -1,3 +1,20 @@
+@font-face {
+  font-family: 'OpenDyslexic';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  size-adjust: 85%;
+  src: url('../node_modules/@fontsource/opendyslexic/files/opendyslexic-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'OpenDyslexic';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 700;
+  size-adjust: 85%;
+  src: url('../node_modules/@fontsource/opendyslexic/files/opendyslexic-latin-700-normal.woff2') format('woff2');
+}
+
 :root {
   --bg: #fff7d1;
   --card: #fffdf2;
@@ -187,6 +204,7 @@ html[data-spacing='wide'] { --leading: 1.8; --tracking: 0.03em; --word-gap: 0.14
 .choice legend { font-weight: 700; padding: 0; margin-bottom: 8px; }
 .choice-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 6.5em), 1fr)); gap: 8px; }
 .choice-option { min-height: 52px; display: flex; align-items: center; justify-content: center; border: var(--border); border-radius: 14px; background: var(--field); font-weight: 700; cursor: pointer; text-align: center; padding: 6px; }
+.choice-look { display: block; width: 100%; padding: 4px 6px; border-radius: 8px; }
 .choice-option:has(input:checked) { background: var(--ink); color: var(--on-ink); }
 .choice-option:has(input:focus-visible) { outline: 4px solid var(--blue); outline-offset: 3px; }
 
