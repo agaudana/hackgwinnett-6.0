@@ -1,85 +1,105 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { AppHeader } from './components/AppHeader'
-import { ReadingRuler } from './components/ReadingRuler'
-import { ErrorScreen } from './screens/ErrorScreen'
-import { ProcessingScreen } from './screens/ProcessingScreen'
-import { ResultsScreen } from './screens/ResultsScreen'
-import { UploadScreen } from './screens/UploadScreen'
-import { AnalyzeError, analyzeDocument } from './lib/api'
-import { usePreferences } from './lib/preferences'
-import { useSpeech } from './lib/speech'
-import type { AnalysisResult, AnalyzeInput } from './lib/types'
+import { useEffect, useReducer, useRef, useState } from 'react'
+import { analyze, backendIsDemo } from './api'
+import { usePreferences } from './preferences'
+import UploadScreen from './UploadScreen'
+import LoadingScreen from './LoadingScreen'
+import ResultsScreen from './ResultsScreen'
+import ErrorScreen from './ErrorScreen'
+import SettingsDialog from './SettingsDialog'
+import ReadingRuler from './ReadingRuler'
+import Icon from './Icon'
+import type { AnalysisData, AnalyzeInput, ApiError, ResultSource } from './types'
 
-type View =
-  | { name: 'upload' }
-  | { name: 'processing'; input: AnalyzeInput; previewUrl: string | null }
-  | { name: 'results'; result: AnalysisResult; previewUrl: string | null }
-  | { name: 'error'; message: string; input: AnalyzeInput }
+type State =
+  | { status: 'idle' }
+  | { status: 'loading'; input: AnalyzeInput }
+  | { status: 'result'; input: AnalyzeInput; data: AnalysisData; source: ResultSource }
+  | { status: 'error'; input: AnalyzeInput; error: ApiError }
+
+type Event =
+  | { type: 'submit'; input: AnalyzeInput }
+  | { type: 'success'; data: AnalysisData; source: ResultSource }
+  | { type: 'failure'; error: ApiError }
+  | { type: 'reset' }
+
+const initial: State = { status: 'idle' }
+
+function reducer(state: State, event: Event): State {
+  switch (event.type) {
+    case 'submit':
+      return { status: 'loading', input: event.input }
+    case 'success':
+      return state.status === 'loading' ? { status: 'result', input: state.input, data: event.data, source: event.source } : state
+    case 'failure':
+      return state.status === 'loading' ? { status: 'error', input: state.input, error: event.error } : state
+    case 'reset':
+      return initial
+  }
+}
 
 export default function App() {
-  const [view, setView] = useState<View>({ name: 'upload' })
-  const controller = useRef<AbortController | null>(null)
-  const mainRef = useRef<HTMLElement>(null)
-  const { prefs } = usePreferences()
-  const { stop } = useSpeech()
-
-  const previewUrl = view.name === 'processing' || view.name === 'results' ? view.previewUrl : null
-  useEffect(() => {
-    if (!previewUrl) return
-    return () => URL.revokeObjectURL(previewUrl)
-  }, [previewUrl])
+  const [state, dispatch] = useReducer(reducer, initial)
+  const [demo, setDemo] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const { prefs, update, reset: resetPrefs } = usePreferences()
+  const inFlight = useRef<AbortController | null>(null)
 
   useEffect(() => {
-    stop()
-    mainRef.current?.focus({ preventScroll: true })
-    window.scrollTo({ top: 0 })
-  }, [view.name, stop])
+    backendIsDemo().then(setDemo)
+  }, [])
 
-  const analyze = useCallback(async (input: AnalyzeInput) => {
-    controller.current?.abort()
-    const abort = new AbortController()
-    controller.current = abort
-    const preview = input.kind === 'image' ? URL.createObjectURL(input.file) : null
-    setView({ name: 'processing', input, previewUrl: preview })
-
+  async function submit(input: AnalyzeInput) {
+    inFlight.current?.abort()
+    const controller = new AbortController()
+    inFlight.current = controller
+    dispatch({ type: 'submit', input })
     try {
-      const result = await analyzeDocument(input, abort.signal)
-      if (abort.signal.aborted) return
-      setView({ name: 'results', result, previewUrl: preview })
+      const result = await analyze(input, controller.signal)
+      dispatch(result.ok ? { type: 'success', data: result.data, source: result.source } : { type: 'failure', error: result.error })
     } catch (error) {
-      if (abort.signal.aborted) return
-      const message =
-        error instanceof AnalyzeError ? error.message : 'Something went wrong while reading your paper. Please try again.'
-      setView({ name: 'error', message, input })
+      if (!controller.signal.aborted) throw error
     }
-  }, [])
+  }
 
-  const reset = useCallback(() => {
-    controller.current?.abort()
-    setView({ name: 'upload' })
-  }, [])
+  function reset() {
+    inFlight.current?.abort()
+    dispatch({ type: 'reset' })
+  }
 
   return (
-    <div className="flex min-h-dvh flex-col">
-      <a
-        href="#main"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
-      >
-        Skip to main content
-      </a>
-      <AppHeader onHome={view.name === 'upload' ? undefined : reset} />
-      <main id="main" ref={mainRef} tabIndex={-1} className="flex flex-1 flex-col outline-none">
-        {view.name === 'upload' && <UploadScreen onAnalyze={analyze} />}
-        {view.name === 'processing' && (
-          <ProcessingScreen previewUrl={view.previewUrl} input={view.input} onCancel={reset} />
+    <div className="app">
+      <header className="topbar">
+        <button className="brand" onClick={reset} aria-label="HealthLens, go to start">
+          <img
+            className="brand-logo"
+            src={prefs.theme === 'dark' ? '/logo/logo-horizontal-dark.svg' : '/logo/logo-horizontal.svg'}
+            alt=""
+          />
+        </button>
+        <div className="topbar-right">
+          {demo && <span className="demo-badge">Demo mode</span>}
+          <button className="btn btn-outline btn-small settings-button" onClick={() => setSettingsOpen(true)}>
+            <Icon name="sliders" /> <span className="settings-label">Reading settings</span>
+          </button>
+        </div>
+      </header>
+
+      <main className="screen">
+        {state.status === 'idle' && <UploadScreen onSubmit={submit} />}
+        {state.status === 'loading' && <LoadingScreen input={state.input} onCancel={reset} />}
+        {state.status === 'result' && (
+          <ResultsScreen data={state.data} source={state.source} speechRate={prefs.speechRate} onReset={reset} />
         )}
-        {view.name === 'results' && (
-          <ResultsScreen result={view.result} previewUrl={view.previewUrl} onStartOver={reset} />
-        )}
-        {view.name === 'error' && (
-          <ErrorScreen message={view.message} onRetry={() => analyze(view.input)} onStartOver={reset} />
+        {state.status === 'error' && (
+          <ErrorScreen error={state.error} onRetry={() => submit(state.input)} onReset={reset} />
         )}
       </main>
+
+      <footer className="disclaimer">
+        HealthLens helps explain your papers. It does not replace your doctor. If you feel very sick, call 911.
+      </footer>
+
+      <SettingsDialog open={settingsOpen} prefs={prefs} onChange={update} onReset={resetPrefs} onClose={() => setSettingsOpen(false)} />
       {prefs.ruler && <ReadingRuler />}
     </div>
   )
