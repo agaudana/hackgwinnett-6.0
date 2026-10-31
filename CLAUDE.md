@@ -5,13 +5,13 @@ We are a team of 3 people, we're going to go ahead and build a working, ready-fo
 
 **Project decisions**
 
-- Product/target user: TBD
-- One sentence problem: TBD
-- Single must-work demo flow: TBD
-- Stack: TBD
-- Frontend run/build commands: TBD
-- Backend run/test commands: TBD
-- Approved AI model / endpoint for the app: TBD
+- Product/target user: Student
+- One sentence problem: Students often don't know how to use the time that they have, and cannot create accurate study plans and study materials by themselves
+- Single must-work demo flow: Student uploads a subject area, test topic, time needed to study --> dedicated study plan + short practice quiz
+- Stack: Whatever Claude thinks is best
+- Frontend run/build commands: Just whatevers available in the workspace third party skills
+- Backend run/test commands: Pstack + Custom Skills
+- Approved AI model / endpoint for the app: Gemini API from my Gemini Pro subscription
 
 **Team ownership**
 - Frontend owner: frontend/ -- screens, components, styles, interactions, loading states, error states
