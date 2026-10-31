@@ -29,6 +29,8 @@
   background: var(--bg);
 }
 
+html[data-font='dyslexic'] { font-family: 'OpenDyslexic', 'Lexend', system-ui, sans-serif; }
+
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); }
 button, input, textarea { font: inherit; color: inherit; }

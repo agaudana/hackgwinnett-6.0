@@ -67,6 +67,12 @@ export default function SettingsDialog({ open, prefs, onChange, onReset, onClose
           onChange={(textSize) => onChange({ textSize })}
           options={[{ value: 'md', label: 'Normal' }, { value: 'lg', label: 'Large' }, { value: 'xl', label: 'Largest' }]}
         />
+        <Choice<'font'>
+          legend="Font"
+          value={prefs.font}
+          onChange={(font) => onChange({ font })}
+          options={[{ value: 'default', label: 'Standard' }, { value: 'dyslexic', label: 'OpenDyslexic' }]}
+        />
         <Choice<'spacing'>
           legend="Space between letters and lines"
           value={prefs.spacing}
