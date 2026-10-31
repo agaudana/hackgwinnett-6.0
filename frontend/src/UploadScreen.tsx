@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { checkImage } from './api'
 import { SAMPLE_TEXT } from './mock'
 import Icon from './Icon'
@@ -11,7 +11,6 @@ export default function UploadScreen({ onSubmit }: { onSubmit: (input: AnalyzeIn
   const [typing, setTyping] = useState(false)
   const [text, setText] = useState('')
   const [dragging, setDragging] = useState(false)
-  const fileInput = useRef<HTMLInputElement>(null)
 
   function choose(picked: File | undefined) {
     if (!picked) return
@@ -27,7 +26,6 @@ export default function UploadScreen({ onSubmit }: { onSubmit: (input: AnalyzeIn
     if (previewUrl) URL.revokeObjectURL(previewUrl)
     setFile(null)
     setPreviewUrl(null)
-    if (fileInput.current) fileInput.current.value = ''
   }
 
   if (file && previewUrl) {
@@ -70,27 +68,39 @@ export default function UploadScreen({ onSubmit }: { onSubmit: (input: AnalyzeIn
     )
   }
 
+  const pickerInput = (capture: boolean) => (
+    <input
+      type="file"
+      accept="image/jpeg,image/png"
+      {...(capture ? { capture: 'environment' as const } : {})}
+      className="visually-hidden"
+      onChange={(e) => {
+        choose(e.target.files?.[0])
+        e.target.value = ''
+      }}
+    />
+  )
+
   return (
     <section className="stack" aria-labelledby="upload-title">
       <h1 id="upload-title">What paper do you have?</h1>
       <p className="lead">Take a picture of it. We will tell you what it means in simple words.</p>
 
+      <label className="btn btn-primary btn-huge">
+        {pickerInput(true)}
+        <Icon name="camera" className="huge-icon" />
+        Take a picture
+      </label>
+
       <label
-        className={`btn btn-primary btn-huge dropzone${dragging ? ' is-dragging' : ''}`}
+        className={`btn btn-outline btn-big dropzone${dragging ? ' is-dragging' : ''}`}
         onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
         onDragLeave={() => setDragging(false)}
         onDrop={(e) => { e.preventDefault(); setDragging(false); choose(e.dataTransfer.files?.[0]) }}
       >
-        <input
-          ref={fileInput}
-          type="file"
-          accept="image/jpeg,image/png"
-          capture="environment"
-          className="visually-hidden"
-          onChange={(e) => choose(e.target.files?.[0])}
-        />
-        <Icon name="camera" className="huge-icon" />
-        Take a picture
+        {pickerInput(false)}
+        <Icon name="upload" />
+        Choose a picture
       </label>
 
       {problem && <p className="inline-error" role="alert">{problem}</p>}
@@ -99,6 +109,15 @@ export default function UploadScreen({ onSubmit }: { onSubmit: (input: AnalyzeIn
       <button className="btn btn-outline btn-big btn-dashed" onClick={() => onSubmit({ kind: 'text', text: SAMPLE_TEXT })}>
         Try an example paper
       </button>
+
+      <div className="tips">
+        <h2 className="tips-title">Tips for a good picture</h2>
+        <ul>
+          <li><Icon name="sun" /> Use bright light with no shadows.</li>
+          <li><Icon name="paper" /> Lay the paper flat and fit all of it in.</li>
+          <li><Icon name="sound" /> You can listen to every answer.</li>
+        </ul>
+      </div>
     </section>
   )
 }

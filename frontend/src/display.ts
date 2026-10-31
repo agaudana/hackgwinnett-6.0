@@ -11,6 +11,10 @@ export const CATEGORY_LABELS: Record<string, string> = {
   instruction: 'Instruction',
   symptom: 'Symptom',
   provider: 'Care provider',
+  condition: 'Health problem',
+  procedure: 'Treatment',
+  test: 'Medical test',
+  other: 'Medical word',
 }
 
 export const priorityOf = (action: KeyAction): Priority =>

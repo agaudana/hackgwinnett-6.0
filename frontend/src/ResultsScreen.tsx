@@ -1,15 +1,16 @@
 import { useState } from 'react'
 import { CATEGORY_LABELS, PRIORITIES, priorityOf, sortActions } from './display'
 import { segmentText } from './segmentText'
-import { useSpeech } from './useSpeech'
+import { splitSentences } from './sentences'
+import { useSpeech, type Speech } from './useSpeech'
 import Icon from './Icon'
 import TermDialog from './TermDialog'
-import type { AnalysisData, KeyAction, MedicalTerm } from './types'
+import type { AnalysisData, KeyAction, MedicalTerm, Preferences, ResultSource } from './types'
 
-type Step = { kind: 'action'; action: KeyAction } | { kind: 'summary' } | { kind: 'terms' }
+type Step = { kind: 'action'; action: KeyAction; actionIndex: number } | { kind: 'summary' } | { kind: 'terms' }
 
 function buildSteps(data: AnalysisData): Step[] {
-  const steps: Step[] = sortActions(data.keyActions).map((action): Step => ({ kind: 'action', action }))
+  const steps: Step[] = sortActions(data.keyActions).map((action, actionIndex): Step => ({ kind: 'action', action, actionIndex }))
   if (data.simplifiedText) steps.push({ kind: 'summary' })
   if (data.medicalTerms.length) steps.push({ kind: 'terms' })
   return steps
@@ -46,16 +47,29 @@ function TermText({ text, terms, onPick }: TermTextProps) {
   return <>{parts}</>
 }
 
-function StepCard({ step, data, onPick }: { step: Step; data: AnalysisData; onPick: (term: MedicalTerm) => void }) {
+interface StepCardProps {
+  step: Step
+  data: AnalysisData
+  speech: Speech
+  done: boolean
+  onToggleDone: () => void
+  onPick: (term: MedicalTerm) => void
+}
+
+function StepCard({ step, data, speech, done, onToggleDone, onPick }: StepCardProps) {
   if (step.kind === 'action') {
     const level = priorityOf(step.action)
     return (
       <>
         <span className={`flag flag-${level}`}>{PRIORITIES[level].label}</span>
         <Icon name={step.action.icon} className="step-icon" />
-        <p className="step-text">
+        <p className={`step-text${done ? ' is-done' : ''}`}>
           <TermText text={step.action.action} terms={data.medicalTerms} onPick={onPick} />
         </p>
+        <button className={`btn btn-big ${done ? 'btn-done' : 'btn-outline'}`} onClick={onToggleDone} aria-pressed={done}>
+          <Icon name={done ? 'tick' : 'check'} />
+          {done ? 'Done' : 'Mark as done'}
+        </button>
       </>
     )
   }
@@ -64,9 +78,29 @@ function StepCard({ step, data, onPick }: { step: Step; data: AnalysisData; onPi
       <>
         <span className="flag flag-normal">Your paper in plain words</span>
         <Icon name="paper" className="step-icon" />
-        <p className="step-body">
-          <TermText text={data.simplifiedText} terms={data.medicalTerms} onPick={onPick} />
-        </p>
+        <ul className="sentences">
+          {splitSentences(data.simplifiedText).map((sentence, i) => {
+            const id = `sentence-${i}`
+            const speaking = speech.speakingId === id
+            return (
+              <li key={i}>
+                <p className="step-body">
+                  <TermText text={sentence} terms={data.medicalTerms} onPick={onPick} />
+                </p>
+                {speech.supported && (
+                  <button
+                    className="btn btn-outline btn-icon"
+                    onClick={() => (speaking ? speech.stop() : speech.speak(id, sentence))}
+                    aria-label={speaking ? 'Stop reading this sentence' : 'Read this sentence to me'}
+                    aria-pressed={speaking}
+                  >
+                    <Icon name={speaking ? 'stop' : 'sound'} />
+                  </button>
+                )}
+              </li>
+            )
+          })}
+        </ul>
       </>
     )
   }
@@ -89,12 +123,47 @@ function StepCard({ step, data, onPick }: { step: Step; data: AnalysisData; onPi
   )
 }
 
-export default function ResultsScreen({ data, onReset }: { data: AnalysisData; onReset: () => void }) {
+function PrintSummary({ steps, data }: { steps: Step[]; data: AnalysisData }) {
+  return (
+    <div className="print-only">
+      <h1>HealthLens: your paper in plain words</h1>
+      <h2>What you need to do</h2>
+      <ol>
+        {steps.map((s, i) =>
+          s.kind === 'action' ? <li key={i}><strong>{PRIORITIES[priorityOf(s.action)].label}:</strong> {s.action.action}</li> : null,
+        )}
+      </ol>
+      <h2>In plain words</h2>
+      <p>{data.simplifiedText}</p>
+      {data.medicalTerms.length > 0 && (
+        <>
+          <h2>Words to know</h2>
+          <dl>
+            {data.medicalTerms.map((t) => (
+              <div key={t.term}><dt>{t.term}</dt><dd>{t.definition}</dd></div>
+            ))}
+          </dl>
+        </>
+      )}
+      <p>HealthLens helps explain your papers. It does not replace your doctor.</p>
+    </div>
+  )
+}
+
+interface Props {
+  data: AnalysisData
+  source: ResultSource
+  speechRate: Preferences['speechRate']
+  onReset: () => void
+}
+
+export default function ResultsScreen({ data, source, speechRate, onReset }: Props) {
   const steps = buildSteps(data)
   const [index, setIndex] = useState(0)
   const [openTerm, setOpenTerm] = useState<MedicalTerm | null>(null)
   const [showOriginal, setShowOriginal] = useState(false)
-  const speech = useSpeech()
+  const [done, setDone] = useState<ReadonlySet<number>>(new Set())
+  const speech = useSpeech(speechRate)
 
   const step = steps[index]
   const isLast = index === steps.length - 1
@@ -103,6 +172,15 @@ export default function ResultsScreen({ data, onReset }: { data: AnalysisData; o
   function go(next: number) {
     speech.stop()
     setIndex(next)
+  }
+
+  function toggleDone(actionIndex: number) {
+    setDone((prev) => {
+      const next = new Set(prev)
+      if (next.has(actionIndex)) next.delete(actionIndex)
+      else next.add(actionIndex)
+      return next
+    })
   }
 
   if (!step) {
@@ -117,6 +195,12 @@ export default function ResultsScreen({ data, onReset }: { data: AnalysisData; o
 
   return (
     <section className="stack" aria-labelledby="results-title">
+      {source === 'sample' && (
+        <p className="sample-note" role="status">
+          <Icon name="info" /> This is an example. HealthLens could not reach its server, so this is not from your paper.
+        </p>
+      )}
+
       <div className="results-head">
         <h1 id="results-title" className="results-title">
           {actionCount > 0 ? `You have ${actionCount} thing${actionCount === 1 ? '' : 's'} to do` : 'Here is your paper'}
@@ -136,10 +220,20 @@ export default function ResultsScreen({ data, onReset }: { data: AnalysisData; o
       <div className="progress" aria-hidden="true">
         {steps.map((_, i) => <span key={i} className={i <= index ? 'on' : ''} />)}
       </div>
-      <p className="step-count" aria-live="polite">Step {index + 1} of {steps.length}</p>
+      <p className="step-count" aria-live="polite">
+        Step {index + 1} of {steps.length}
+        {actionCount > 0 && <span className="done-count"> · {done.size} of {actionCount} done</span>}
+      </p>
 
       <div className="step-card" key={index}>
-        <StepCard step={step} data={data} onPick={setOpenTerm} />
+        <StepCard
+          step={step}
+          data={data}
+          speech={speech}
+          done={step.kind === 'action' && done.has(step.actionIndex)}
+          onToggleDone={() => step.kind === 'action' && toggleDone(step.actionIndex)}
+          onPick={setOpenTerm}
+        />
       </div>
 
       {speech.supported ? (
@@ -170,19 +264,23 @@ export default function ResultsScreen({ data, onReset }: { data: AnalysisData; o
         )}
       </div>
 
-      {data.originalText && (
-        <div className="original">
+      <div className="original">
+        {data.originalText && (
           <button className="btn btn-link" onClick={() => setShowOriginal((v) => !v)} aria-expanded={showOriginal}>
             {showOriginal ? 'Hide the original words' : 'See the original words from your paper'}
           </button>
-          {showOriginal && (
-            <p className="original-text">
-              <TermText text={data.originalText} terms={data.medicalTerms} onPick={setOpenTerm} />
-            </p>
-          )}
-        </div>
+        )}
+        <button className="btn btn-link" onClick={() => window.print()}>
+          <Icon name="print" /> Print or save
+        </button>
+      </div>
+      {showOriginal && (
+        <p className="original-text">
+          <TermText text={data.originalText} terms={data.medicalTerms} onPick={setOpenTerm} />
+        </p>
       )}
 
+      <PrintSummary steps={steps} data={data} />
       <TermDialog term={openTerm} speech={speech} onClose={() => setOpenTerm(null)} />
     </section>
   )

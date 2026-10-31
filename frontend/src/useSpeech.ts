@@ -9,7 +9,7 @@ export interface Speech {
   stop: () => void
 }
 
-export function useSpeech(): Speech {
+export function useSpeech(rate = 0.9): Speech {
   const [speakingId, setSpeakingId] = useState<string | null>(null)
 
   const stop = useCallback(() => {
@@ -21,13 +21,13 @@ export function useSpeech(): Speech {
     if (!synth) return
     synth.cancel()
     const utterance = new SpeechSynthesisUtterance(text)
-    utterance.rate = 0.9
+    utterance.rate = rate
     const done = () => setSpeakingId((current) => (current === id ? null : current))
     utterance.onend = done
     utterance.onerror = done
     setSpeakingId(id)
     synth.speak(utterance)
-  }, [])
+  }, [rate])
 
   useEffect(() => () => synth?.cancel(), [])
 

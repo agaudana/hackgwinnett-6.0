@@ -3,7 +3,7 @@ import type { AnalyzeInput } from './types'
 
 const STEPS = ['Reading your paper…', 'Putting it into plain words…', 'Finding what you need to do…']
 
-export default function LoadingScreen({ input }: { input: AnalyzeInput }) {
+export default function LoadingScreen({ input, onCancel }: { input: AnalyzeInput; onCancel: () => void }) {
   const [step, setStep] = useState(input.kind === 'image' ? 0 : 1)
 
   useEffect(() => {
@@ -16,7 +16,8 @@ export default function LoadingScreen({ input }: { input: AnalyzeInput }) {
       {input.kind === 'image' && <img className="loading-thumb" src={input.previewUrl} alt="" />}
       <div className="spinner" aria-hidden="true" />
       <h1 id="loading-title" className="loading-title" aria-live="polite">{STEPS[step]}</h1>
-      <p className="lead">This usually takes a few seconds.</p>
+      <p className="lead">This can take up to half a minute for a photo.</p>
+      <button className="btn btn-outline btn-big" onClick={onCancel}>Cancel</button>
     </section>
   )
 }

@@ -30,4 +30,16 @@ export type AnalyzeInput =
   | { kind: 'image'; file: File; previewUrl: string }
   | { kind: 'text'; text: string }
 
-export type AnalyzeResult = { ok: true; data: AnalysisData } | { ok: false; error: ApiError }
+export type ResultSource = 'live' | 'sample'
+
+export type AnalyzeResult =
+  | { ok: true; data: AnalysisData; source: ResultSource }
+  | { ok: false; error: ApiError }
+
+export interface Preferences {
+  textSize: 'md' | 'lg' | 'xl'
+  spacing: 'normal' | 'wide'
+  theme: 'yellow' | 'white' | 'dark'
+  ruler: boolean
+  speechRate: 0.75 | 0.9
+}

@@ -1,7 +1,12 @@
 import { MOCK_RESPONSE, MOCK_ERROR_TRIGGER } from './mock'
 import type { AnalysisData, AnalyzeInput, AnalyzeResult, ApiError } from './types'
 
-export const USE_MOCK = import.meta.env.VITE_USE_MOCK !== 'false'
+type MockMode = 'always' | 'never' | 'fallback'
+
+const MOCK_MODE: MockMode =
+  import.meta.env.VITE_USE_MOCK === 'true' ? 'always' : import.meta.env.VITE_USE_MOCK === 'false' ? 'never' : 'fallback'
+
+export const ALWAYS_MOCK = MOCK_MODE === 'always'
 
 const MAX_BYTES = 10 * 1024 * 1024
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png']
@@ -10,6 +15,8 @@ const NETWORK_ERROR: ApiError = {
   code: 'NETWORK_ERROR',
   message: "We couldn't reach HealthLens. Check your internet and try again.",
 }
+
+class BackendUnreachable extends Error {}
 
 export function checkImage(file: File): ApiError | null {
   if (!ACCEPTED_TYPES.includes(file.type)) {
@@ -31,41 +38,75 @@ function parseAnalysis(data: unknown): AnalysisData {
   }
 }
 
-async function mockAnalyze(input: AnalyzeInput): Promise<AnalyzeResult> {
-  await new Promise((r) => setTimeout(r, 1800))
+function wait(ms: number, signal: AbortSignal) {
+  return new Promise<void>((resolve, reject) => {
+    const timer = setTimeout(resolve, ms)
+    signal.addEventListener('abort', () => {
+      clearTimeout(timer)
+      reject(new DOMException('Aborted', 'AbortError'))
+    })
+  })
+}
+
+async function sample(input: AnalyzeInput, signal: AbortSignal): Promise<AnalyzeResult> {
+  await wait(1800, signal)
   if (input.kind === 'text' && input.text.trim().toLowerCase() === MOCK_ERROR_TRIGGER) {
     return { ok: false, error: { code: 'AI_PROCESSING_FAILED', message: 'Unable to simplify document at this time. Please try again' } }
   }
   const data = parseAnalysis(MOCK_RESPONSE.data)
   if (input.kind === 'text') data.originalText = input.text
-  return { ok: true, data }
+  return { ok: true, data, source: 'sample' }
 }
 
-export async function analyze(input: AnalyzeInput): Promise<AnalyzeResult> {
-  if (USE_MOCK) return mockAnalyze(input)
+async function callBackend(input: AnalyzeInput, signal: AbortSignal): Promise<AnalyzeResult> {
+  const request: RequestInit =
+    input.kind === 'image'
+      ? { method: 'POST', body: formFor(input.file), signal }
+      : {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: input.text, inputType: 'text' }),
+          signal,
+        }
 
-  let request: RequestInit
-  if (input.kind === 'image') {
-    const form = new FormData()
-    form.append('image', input.file)
-    form.append('inputType', 'image')
-    request = { method: 'POST', body: form }
-  } else {
-    request = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: input.text, inputType: 'text' }),
-    }
-  }
-
-  let body: { success?: boolean; data?: unknown; error?: Partial<ApiError> } | null
+  let body: { success?: unknown; data?: unknown; error?: Partial<ApiError> }
   try {
     const res = await fetch('/api/analyze', request)
     body = await res.json()
-  } catch {
-    return { ok: false, error: NETWORK_ERROR }
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') throw error
+    throw new BackendUnreachable()
   }
-  if (body?.success) return { ok: true, data: parseAnalysis(body.data) }
-  const err = body?.error
+  if (typeof body?.success !== 'boolean') throw new BackendUnreachable()
+  if (body.success) return { ok: true, data: parseAnalysis(body.data), source: 'live' }
+  const err = body.error
   return { ok: false, error: err?.message ? { code: String(err.code ?? 'UNKNOWN'), message: err.message } : NETWORK_ERROR }
+}
+
+function formFor(file: File) {
+  const form = new FormData()
+  form.append('image', file)
+  form.append('inputType', 'image')
+  return form
+}
+
+export async function analyze(input: AnalyzeInput, signal: AbortSignal): Promise<AnalyzeResult> {
+  if (MOCK_MODE === 'always') return sample(input, signal)
+  try {
+    return await callBackend(input, signal)
+  } catch (error) {
+    if (!(error instanceof BackendUnreachable)) throw error
+    return MOCK_MODE === 'fallback' ? sample(input, signal) : { ok: false, error: NETWORK_ERROR }
+  }
+}
+
+export async function backendIsDemo(): Promise<boolean> {
+  if (MOCK_MODE === 'always') return true
+  try {
+    const res = await fetch('/api/health')
+    const health = await res.json()
+    return health?.services?.ai === 'mock'
+  } catch {
+    return MOCK_MODE === 'fallback'
+  }
 }
