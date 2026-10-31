@@ -24,6 +24,7 @@
 ### Background & Surfaces
 - **Background:** `#ECFEFF` - Light cyan tint, reduces eye strain
 - **Card:** `#FFFFFF` - Pure white for content cards
+- **Muted:** `#E8F1F6` - Subtle backgrounds for icons/sections
 
 ### Text Colors
 - **Foreground:** `#164E63` - Primary text (cyan-900)
