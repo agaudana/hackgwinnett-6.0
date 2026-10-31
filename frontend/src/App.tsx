@@ -70,7 +70,11 @@ export default function App() {
     <div className="app">
       <header className="topbar">
         <button className="brand" onClick={reset} aria-label="HealthLens, go to start">
-          <Icon name="lens" /> HealthLens
+          <img
+            className="brand-logo"
+            src={prefs.theme === 'dark' ? '/logo/logo-horizontal-dark.svg' : '/logo/logo-horizontal.svg'}
+            alt=""
+          />
         </button>
         <div className="topbar-right">
           {demo && <span className="demo-badge">Demo mode</span>}

@@ -50,6 +50,7 @@ p { margin: 0; }
 
 .topbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; padding: 14px 0; }
 .brand { display: inline-flex; align-items: center; gap: 8px; background: none; border: 0; padding: 4px 0; font-weight: 700; font-size: 1.05rem; cursor: pointer; }
+.brand-logo { height: 34px; width: auto; display: block; }
 .topbar-right { display: flex; align-items: center; gap: 8px; margin-left: auto; }
 .demo-badge { font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border: 2px solid var(--ink); border-radius: 999px; background: var(--amber); color: var(--amber-ink); white-space: nowrap; }
 

@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import { buildIcs, describeEvents, downloadIcs, toCalendarEvents } from './calendar'
 import { CATEGORY_LABELS, PRIORITIES, priorityOf, sortActions } from './display'
 import { segmentText } from './segmentText'
 import { splitSentences } from './sentences'
@@ -164,6 +165,7 @@ export default function ResultsScreen({ data, source, speechRate, onReset }: Pro
   const [showOriginal, setShowOriginal] = useState(false)
   const [done, setDone] = useState<ReadonlySet<number>>(new Set())
   const speech = useSpeech(speechRate)
+  const calendarEvents = useMemo(() => toCalendarEvents(data.keyActions), [data.keyActions])
 
   const step = steps[index]
   const isLast = index === steps.length - 1
@@ -273,7 +275,17 @@ export default function ResultsScreen({ data, source, speechRate, onReset }: Pro
         <button className="btn btn-link" onClick={() => window.print()}>
           <Icon name="print" /> Print or save
         </button>
+        {calendarEvents.length > 0 && (
+          <button className="btn btn-link" onClick={() => downloadIcs(buildIcs(calendarEvents))} aria-describedby="calendar-hint">
+            <Icon name="calendar" /> Add to my calendar
+          </button>
+        )}
       </div>
+      {calendarEvents.length > 0 && (
+        <p id="calendar-hint" className="hint">
+          {describeEvents(calendarEvents)} Times are suggestions. Follow your doctor's instructions.
+        </p>
+      )}
       {showOriginal && (
         <p className="original-text">
           <TermText text={data.originalText} terms={data.medicalTerms} onPick={setOpenTerm} />
