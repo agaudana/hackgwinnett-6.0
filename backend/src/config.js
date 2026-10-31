@@ -27,8 +27,45 @@ export function readConfig(env) {
     port: positiveInt(env.PORT, 3000),
     corsOrigin: env.CORS_ORIGIN?.trim() || 'http://localhost:5173',
     ai,
+    vision: readVisionConfig(env),
     ocr: { lang: 'eng', timeoutMs: positiveInt(env.OCR_TIMEOUT_MS, 45_000), cachePath: path.join(BACKEND_ROOT, '.tesseract-cache') },
   });
+}
+
+/**
+ * Vision (pill identification) mode rule:
+ *   MOCK_AI=1                                   -> mock
+ *   BEDROCK_RUNTIME_URL + BEDROCK_API_KEY set   -> live
+ *   else OPENAI_BASE_URL is a bedrock-runtime URL with OPENAI_API_KEY -> live, same host and key
+ *   otherwise                                   -> mock
+ */
+function readVisionConfig(env) {
+  const forcedMock = env.MOCK_AI?.trim() === '1';
+  let runtimeURL = env.BEDROCK_RUNTIME_URL?.trim() ?? '';
+  let apiKey = env.BEDROCK_API_KEY?.trim() ?? '';
+  if (!runtimeURL || !apiKey) {
+    const host = safeHost(env.OPENAI_BASE_URL?.trim());
+    if (host?.startsWith('bedrock-runtime.')) {
+      runtimeURL ||= `https://${host}`;
+      apiKey ||= env.OPENAI_API_KEY?.trim() ?? '';
+    }
+  }
+  if (forcedMock || !runtimeURL || !apiKey) return { mode: 'mock' };
+  return {
+    mode: 'live',
+    apiKey,
+    runtimeURL: runtimeURL.replace(/\/+$/, ''),
+    model: env.VISION_MODEL?.trim() || 'us.anthropic.claude-sonnet-5-5',
+    timeoutMs: positiveInt(env.AI_TIMEOUT_MS, 45_000),
+  };
+}
+
+function safeHost(url) {
+  try {
+    return url ? new URL(url).host : null;
+  } catch {
+    return null;
+  }
 }
 
 function positiveInt(value, fallback) {

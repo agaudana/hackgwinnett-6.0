@@ -1,5 +1,5 @@
-import { MOCK_RESPONSE, MOCK_ERROR_TRIGGER } from './mock'
-import type { AnalysisData, AnalyzeInput, AnalyzeResult, ApiError } from './types'
+import { MOCK_RESPONSE, MOCK_ERROR_TRIGGER, MOCK_PILL, EXAMPLE_PILL, EXAMPLE_PILL_URL } from './mock'
+import type { AnalysisData, AnalyzeInput, AnalyzeResult, ApiError, IdentifyResult, PillData, PillInput } from './types'
 
 type MockMode = 'always' | 'never' | 'fallback'
 
@@ -108,5 +108,81 @@ export async function backendIsDemo(): Promise<boolean> {
     return health?.services?.ai === 'mock'
   } catch {
     return MOCK_MODE === 'fallback'
+  }
+}
+
+// --- pill identification (POST /api/identify) ------------------------------
+
+// Pill-specific wording for the shared error codes; the server messages talk about "documents".
+const PILL_MESSAGES: Record<string, string> = {
+  MISSING_INPUT: 'Please take a picture of the pill or the bottle first.',
+  AI_PROCESSING_FAILED: 'We could not check this picture right now. Please try again.',
+}
+
+// The vision model rejects images over ~3.75MB, and phone photos are often bigger.
+// Pills and labels stay readable at this size. Falls back to the original file if resizing fails.
+const MAX_UPLOAD_SIDE = 1600
+
+async function shrinkForUpload(file: File): Promise<File> {
+  try {
+    const bitmap = await createImageBitmap(file)
+    const scale = Math.min(1, MAX_UPLOAD_SIDE / Math.max(bitmap.width, bitmap.height))
+    if (scale === 1 && file.size < 3 * 1024 * 1024) return file
+    const canvas = document.createElement('canvas')
+    canvas.width = Math.round(bitmap.width * scale)
+    canvas.height = Math.round(bitmap.height * scale)
+    canvas.getContext('2d')?.drawImage(bitmap, 0, 0, canvas.width, canvas.height)
+    bitmap.close()
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.85))
+    return blob ? new File([blob], 'photo.jpg', { type: 'image/jpeg' }) : file
+  } catch {
+    return file
+  }
+}
+
+async function samplePill(input: PillInput, signal: AbortSignal): Promise<IdentifyResult> {
+  await wait(1800, signal)
+  return { ok: true, data: input.sample ?? MOCK_PILL, source: 'sample' }
+}
+
+async function callIdentify(input: PillInput, signal: AbortSignal): Promise<IdentifyResult> {
+  const form = new FormData()
+  form.append('image', await shrinkForUpload(input.file))
+
+  let body: { success?: unknown; data?: unknown; error?: Partial<ApiError> }
+  try {
+    const res = await fetch('/api/identify', { method: 'POST', body: form, signal })
+    body = await res.json()
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') throw error
+    throw new BackendUnreachable()
+  }
+  if (typeof body?.success !== 'boolean') throw new BackendUnreachable()
+  if (body.success) return { ok: true, data: body.data as PillData, source: 'live' }
+  const err = body.error
+  if (!err?.message) return { ok: false, error: NETWORK_ERROR }
+  const code = String(err.code ?? 'UNKNOWN')
+  return { ok: false, error: { code, message: PILL_MESSAGES[code] ?? err.message } }
+}
+
+export async function identifyPill(input: PillInput, signal: AbortSignal): Promise<IdentifyResult> {
+  if (MOCK_MODE === 'always') return samplePill(input, signal)
+  try {
+    return await callIdentify(input, signal)
+  } catch (error) {
+    if (!(error instanceof BackendUnreachable)) throw error
+    return MOCK_MODE === 'fallback' ? samplePill(input, signal) : { ok: false, error: NETWORK_ERROR }
+  }
+}
+
+/** Loads the bundled example pill photo as a File so it goes through the same flow as a real upload. */
+export async function loadExamplePill(): Promise<PillInput | null> {
+  try {
+    const res = await fetch(EXAMPLE_PILL_URL)
+    if (!res.ok) return null
+    const file = new File([await res.blob()], 'example-pill.jpg', { type: 'image/jpeg' })
+    return { file, previewUrl: URL.createObjectURL(file), sample: EXAMPLE_PILL }
+  } catch {
+    return null
   }
 }

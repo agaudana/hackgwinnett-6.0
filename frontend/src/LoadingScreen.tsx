@@ -1,15 +1,21 @@
 import { useEffect, useState } from 'react'
 import type { AnalyzeInput } from './types'
 
-const STEPS = ['Reading your paper…', 'Putting it into plain words…', 'Finding what you need to do…']
+const PAPER_STEPS = ['Reading your paper…', 'Putting it into plain words…', 'Finding what you need to do…']
 
-export default function LoadingScreen({ input, onCancel }: { input: AnalyzeInput; onCancel: () => void }) {
+interface Props {
+  input: AnalyzeInput
+  onCancel: () => void
+  steps?: string[]
+}
+
+export default function LoadingScreen({ input, onCancel, steps: STEPS = PAPER_STEPS }: Props) {
   const [step, setStep] = useState(input.kind === 'image' ? 0 : 1)
 
   useEffect(() => {
     const timer = setInterval(() => setStep((s) => Math.min(s + 1, STEPS.length - 1)), 2500)
     return () => clearInterval(timer)
-  }, [])
+  }, [STEPS.length])
 
   return (
     <section className="stack center" aria-busy="true" aria-labelledby="loading-title">

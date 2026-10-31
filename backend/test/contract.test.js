@@ -14,7 +14,8 @@ function contractErrors(markdown) {
 }
 
 test('error codes, statuses, and messages equal API_CONTRACT.md', { skip: !existsSync(CONTRACT) && 'API_CONTRACT.md not found' }, () => {
-  const errors = contractErrors(readFileSync(CONTRACT, 'utf8'));
+  // Normalize CRLF: Windows checkouts (core.autocrlf=true) otherwise match zero blocks.
+  const errors = contractErrors(readFileSync(CONTRACT, 'utf8').replace(/\r\n/g, '\n'));
   assert.equal(errors.length, 5, 'expected 5 error examples in API_CONTRACT.md');
   for (const { status, body } of errors) {
     assert.deepEqual(toErrorResponse(new AnalyzeError(body.error.code)), { status, body });

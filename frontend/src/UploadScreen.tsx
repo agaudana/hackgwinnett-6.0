@@ -1,23 +1,30 @@
 import { useState } from 'react'
-import { checkImage } from './api'
+import { checkImage, loadExamplePill } from './api'
 import { SAMPLE_TEXT } from './mock'
 import Icon from './Icon'
-import type { AnalyzeInput } from './types'
+import type { AnalyzeInput, PillInput } from './types'
 
-export default function UploadScreen({ onSubmit }: { onSubmit: (input: AnalyzeInput) => void }) {
+interface Props {
+  onSubmit: (input: AnalyzeInput) => void
+  onCheckPill: (input: PillInput) => void
+}
+
+export default function UploadScreen({ onSubmit, onCheckPill }: Props) {
   const [file, setFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [problem, setProblem] = useState<string | null>(null)
   const [typing, setTyping] = useState(false)
   const [text, setText] = useState('')
   const [dragging, setDragging] = useState(false)
+  const [forPill, setForPill] = useState(false)
 
-  function choose(picked: File | undefined) {
+  function choose(picked: File | undefined, pill = false) {
     if (!picked) return
     const issue = checkImage(picked)
     setProblem(issue?.message ?? null)
     if (issue) return
     if (previewUrl) URL.revokeObjectURL(previewUrl)
+    setForPill(pill)
     setFile(picked)
     setPreviewUrl(URL.createObjectURL(picked))
   }
@@ -26,6 +33,19 @@ export default function UploadScreen({ onSubmit }: { onSubmit: (input: AnalyzeIn
     if (previewUrl) URL.revokeObjectURL(previewUrl)
     setFile(null)
     setPreviewUrl(null)
+  }
+
+  if (file && previewUrl && forPill) {
+    return (
+      <section className="stack" aria-labelledby="preview-title">
+        <h1 id="preview-title">Is this the pill or bottle?</h1>
+        <img className="preview-img" src={previewUrl} alt="The photo you chose" />
+        <button className="btn btn-primary btn-huge" onClick={() => onCheckPill({ file, previewUrl })}>
+          Yes, tell me what it is
+        </button>
+        <button className="btn btn-outline btn-big" onClick={clearPhoto}>Take a different picture</button>
+      </section>
+    )
   }
 
   if (file && previewUrl) {
@@ -68,14 +88,14 @@ export default function UploadScreen({ onSubmit }: { onSubmit: (input: AnalyzeIn
     )
   }
 
-  const pickerInput = (capture: boolean) => (
+  const pickerInput = (capture: boolean, pill = false) => (
     <input
       type="file"
       accept="image/jpeg,image/png"
       {...(capture ? { capture: 'environment' as const } : {})}
       className="visually-hidden"
       onChange={(e) => {
-        choose(e.target.files?.[0])
+        choose(e.target.files?.[0], pill)
         e.target.value = ''
       }}
     />
@@ -116,6 +136,27 @@ export default function UploadScreen({ onSubmit }: { onSubmit: (input: AnalyzeIn
           Try an example paper
         </button>
       </div>
+
+      <label className="btn btn-outline btn-big pill-button">
+        {/* No capture: phones then offer both the camera and the photo library. */}
+        {pickerInput(false, true)}
+        <Icon name="medication" />
+        <span>
+          What is this pill?
+          <small>Take a picture of a pill or a medicine bottle</small>
+        </span>
+      </label>
+
+      <button
+        className="btn btn-outline btn-big btn-dashed"
+        onClick={async () => {
+          const example = await loadExamplePill()
+          if (example) onCheckPill(example)
+          else setProblem('The example pill could not load. Please try again.')
+        }}
+      >
+        Try an example pill
+      </button>
 
       <div className="tips">
         <h2 className="tips-title">Tips for a good picture</h2>

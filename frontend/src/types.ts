@@ -44,3 +44,32 @@ export interface Preferences {
   ruler: boolean
   speechRate: 0.75 | 0.9
 }
+
+// POST /api/identify (API_CONTRACT.md v1.1)
+
+export type PillConfidence = 'high' | 'medium' | 'low'
+
+export interface PillData {
+  identified: boolean
+  kind: 'bottle' | 'pill' | 'unknown'
+  medicationName: string
+  strength: string
+  purpose: string
+  howToTake: string
+  appearance: string
+  imprint: string
+  warnings: string[]
+  confidence: PillConfidence
+  summary: string
+}
+
+export interface PillInput {
+  file: File
+  previewUrl: string
+  /** Offline fallback that matches this photo (used by the built-in example pill). */
+  sample?: PillData
+}
+
+export type IdentifyResult =
+  | { ok: true; data: PillData; source: ResultSource }
+  | { ok: false; error: ApiError }
