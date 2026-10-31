@@ -215,16 +215,15 @@ html[data-spacing='wide'] { --leading: 1.8; --tracking: 0.03em; --word-gap: 0.14
 /* Pill check (POST /api/identify) */
 .pill-head { display: flex; gap: 14px; align-items: center; }
 .pill-thumb { width: 88px; height: 88px; flex: none; object-fit: cover; border: var(--border); border-radius: 14px; background: var(--field); }
-.pill-kicker { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--sub); }
 .safety-note { display: flex; gap: 12px; align-items: flex-start; background: var(--amber); color: var(--amber-ink); border: var(--border); border-radius: var(--radius); padding: 14px 16px; }
 .safety-note .icon { width: 1.6em; height: 1.6em; margin-top: 2px; }
-.safety-note p + p { margin-top: 6px; }
+.safety-note p + p { margin-top: 4px; }
 .safety-note a { color: inherit; font-weight: 700; text-underline-offset: 4px; }
-.pill-section { background: var(--card); border: var(--border); border-radius: var(--radius); padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
-.pill-section-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-.pill-section h2 { font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
-.warn-list { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; }
-.imprint { font-family: ui-monospace, Menlo, monospace; font-weight: 700; background: var(--term); border: 2px solid var(--ink); border-radius: 6px; padding: 0 6px; }
 .pill-button { justify-content: flex-start; text-align: left; }
 .pill-button .icon { width: 36px; height: 36px; }
 .pill-button small { display: block; font-size: 0.8rem; font-weight: 600; color: var(--sub); }
+.pill-name { font-size: 1.7rem; line-height: 1.15; }
+.pill-facts { margin: 0; display: grid; gap: 12px; }
+.pill-facts > div { display: grid; gap: 2px; padding: 10px 14px; background: var(--field); border: 2px solid var(--ink); border-radius: 14px; }
+.pill-facts dt { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--sub); }
+.pill-facts dd { margin: 0; font-size: 1.15rem; font-weight: 700; line-height: 1.3; }

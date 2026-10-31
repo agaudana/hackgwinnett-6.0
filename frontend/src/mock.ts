@@ -29,15 +29,15 @@ export const MOCK_RESPONSE: { success: true; data: AnalysisData } = {
 
 // Demo-mode pill answer, matching the /identify example shape in API_CONTRACT.md v1.1.
 export const MOCK_PILL: PillData = {
-  identified: true,
   kind: 'bottle',
   medicationName: 'Lisinopril',
   strength: '10 mg',
-  purpose: 'This medicine lowers blood pressure. It helps protect your heart and kidneys.',
-  howToTake: 'Take 1 pill by mouth every morning.',
-  appearance: 'Orange pill bottle with a white label. The pills are small, round, and pink.',
+  purpose: 'High blood pressure.',
+  howToTake: '1 pill every morning.',
+  appearance: 'Small pink round pill.',
   imprint: '',
-  warnings: ['It may make you dizzy. Stand up slowly.', 'Tell your doctor if you get a dry cough or swelling in your face.'],
+  warnings: ['May make you dizzy.', 'Stand up slowly.'],
   confidence: 'high',
-  summary: 'This is lisinopril, 10 mg. It lowers blood pressure. Take 1 pill by mouth every morning.',
+  identified: true,
+  summary: 'Lisinopril is for high blood pressure.',
 }

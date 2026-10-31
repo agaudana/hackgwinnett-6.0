@@ -227,7 +227,8 @@ Field: "image" (file, required) - JPEG/PNG photo of a pill or medicine bottle, u
 - `confidence`: `"high"` | `"medium"` | `"low"`. Server policy: a loose pill is never `"high"`; not identified is always `"low"`. Frontend should show medium/low as "possible match" / "not sure".
 - `howToTake`: only from directions printed on a visible label, never inferred.
 - `imprint`: letters/numbers stamped on the pill.
-- `summary`: always non-empty; written to be read aloud.
+- `summary`: always non-empty, one short sentence.
+- **Brevity (readers may have dyslexia):** every text field is one short phrase. Roughly: `medicationName` 1-2 words, `purpose` ≤6 words (the health problem only, e.g. "High blood sugar."), `howToTake` ≤10, `appearance` ≤8, `summary` ≤12, at most 2 `warnings` of ≤6 words each. Server caps lengths as a backstop.
 
 ### Errors
 Same error body format and the same codes/messages as `/analyze`: `MISSING_INPUT` (400, no image),

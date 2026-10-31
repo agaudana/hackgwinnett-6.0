@@ -119,15 +119,13 @@ const MOCK_PILL_REPLY = Object.freeze({
   kind: 'bottle',
   medicationName: 'Lisinopril',
   strength: '10 mg',
-  purpose: 'This medicine lowers blood pressure. It helps protect your heart and kidneys.',
-  howToTake: 'Take 1 pill by mouth every morning.',
-  appearance: 'Orange pill bottle with a white label. The pills are small, round, and pink.',
+  purpose: 'High blood pressure.',
+  howToTake: '1 pill every morning.',
+  appearance: 'Small pink round pill.',
   imprint: '',
-  warnings: ['It may make you dizzy. Stand up slowly.', 'Tell your doctor if you get a dry cough or swelling in your face.'],
+  warnings: ['May make you dizzy.', 'Stand up slowly.'],
   confidence: 'high',
-  summary:
-    'DEMO MODE: no AI key is set, so this is a sample answer, not based on your photo. ' +
-    'This is lisinopril, 10 mg. It lowers blood pressure. Take 1 pill by mouth every morning.',
+  summary: 'DEMO MODE: sample answer, not from your photo. Lisinopril is for high blood pressure.',
 });
 
 /** @returns {VisionPort} */
