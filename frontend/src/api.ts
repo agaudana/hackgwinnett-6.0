@@ -1,4 +1,4 @@
-import { MOCK_RESPONSE, MOCK_ERROR_TRIGGER, MOCK_PILL } from './mock'
+import { MOCK_RESPONSE, MOCK_ERROR_TRIGGER, MOCK_PILL, EXAMPLE_PILL, EXAMPLE_PILL_URL } from './mock'
 import type { AnalysisData, AnalyzeInput, AnalyzeResult, ApiError, IdentifyResult, PillData, PillInput } from './types'
 
 type MockMode = 'always' | 'never' | 'fallback'
@@ -140,9 +140,9 @@ async function shrinkForUpload(file: File): Promise<File> {
   }
 }
 
-async function samplePill(signal: AbortSignal): Promise<IdentifyResult> {
+async function samplePill(input: PillInput, signal: AbortSignal): Promise<IdentifyResult> {
   await wait(1800, signal)
-  return { ok: true, data: MOCK_PILL, source: 'sample' }
+  return { ok: true, data: input.sample ?? MOCK_PILL, source: 'sample' }
 }
 
 async function callIdentify(input: PillInput, signal: AbortSignal): Promise<IdentifyResult> {
@@ -166,11 +166,23 @@ async function callIdentify(input: PillInput, signal: AbortSignal): Promise<Iden
 }
 
 export async function identifyPill(input: PillInput, signal: AbortSignal): Promise<IdentifyResult> {
-  if (MOCK_MODE === 'always') return samplePill(signal)
+  if (MOCK_MODE === 'always') return samplePill(input, signal)
   try {
     return await callIdentify(input, signal)
   } catch (error) {
     if (!(error instanceof BackendUnreachable)) throw error
-    return MOCK_MODE === 'fallback' ? samplePill(signal) : { ok: false, error: NETWORK_ERROR }
+    return MOCK_MODE === 'fallback' ? samplePill(input, signal) : { ok: false, error: NETWORK_ERROR }
+  }
+}
+
+/** Loads the bundled example pill photo as a File so it goes through the same flow as a real upload. */
+export async function loadExamplePill(): Promise<PillInput | null> {
+  try {
+    const res = await fetch(EXAMPLE_PILL_URL)
+    if (!res.ok) return null
+    const file = new File([await res.blob()], 'example-pill.jpg', { type: 'image/jpeg' })
+    return { file, previewUrl: URL.createObjectURL(file), sample: EXAMPLE_PILL }
+  } catch {
+    return null
   }
 }

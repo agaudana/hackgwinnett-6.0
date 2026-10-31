@@ -65,6 +65,8 @@ export interface PillData {
 export interface PillInput {
   file: File
   previewUrl: string
+  /** Offline fallback that matches this photo (used by the built-in example pill). */
+  sample?: PillData
 }
 
 export type IdentifyResult =

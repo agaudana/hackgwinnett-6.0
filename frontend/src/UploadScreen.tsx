@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { checkImage } from './api'
+import { checkImage, loadExamplePill } from './api'
 import { SAMPLE_TEXT } from './mock'
 import Icon from './Icon'
 import type { AnalyzeInput, PillInput } from './types'
@@ -138,6 +138,16 @@ export default function UploadScreen({ onSubmit, onCheckPill }: Props) {
       <button className="btn btn-outline btn-big" onClick={() => setTyping(true)}>Type the words instead</button>
       <button className="btn btn-outline btn-big btn-dashed" onClick={() => onSubmit({ kind: 'text', text: SAMPLE_TEXT })}>
         Try an example paper
+      </button>
+      <button
+        className="btn btn-outline btn-big btn-dashed"
+        onClick={async () => {
+          const example = await loadExamplePill()
+          if (example) onCheckPill(example)
+          else setProblem('The example pill could not load. Please try again.')
+        }}
+      >
+        Try an example pill
       </button>
 
       <div className="tips">

@@ -41,3 +41,20 @@ export const MOCK_PILL: PillData = {
   identified: true,
   summary: 'Lisinopril is for high blood pressure.',
 }
+
+// "Try an example pill": photo in public/samples, plus a matching answer in case the server is unreachable.
+export const EXAMPLE_PILL_URL = '/samples/images.jpeg'
+
+export const EXAMPLE_PILL: PillData = {
+  identified: true,
+  kind: 'pill',
+  medicationName: 'Biktarvy',
+  strength: '',
+  purpose: 'HIV infection.',
+  howToTake: '',
+  appearance: 'Brown-pink oval pill.',
+  imprint: 'GSI 9883',
+  warnings: [],
+  confidence: 'medium',
+  summary: 'The stamp matches Biktarvy, an HIV medicine.',
+}
