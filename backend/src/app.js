@@ -6,9 +6,10 @@
 import express from 'express';
 import multer from 'multer';
 import { analyzeDocument, toErrorResponse, healthReport, AnalyzeError, MAX_IMAGE_BYTES } from './analyze.js';
+import { identifyPill } from './identify.js';
 
 /**
- * @param {import('./analyze.js').Deps} deps
+ * @param {import('./analyze.js').Deps & { vision?: import('./identify.js').VisionPort }} deps
  * @param {{ corsOrigin: string, log?: (line: string) => void }} options
  */
 export function createApp(deps, { corsOrigin, log = console.error }) {
@@ -22,6 +23,12 @@ export function createApp(deps, { corsOrigin, log = console.error }) {
 
   app.post('/api/analyze', parseJson, parseUpload, async (req, res) => {
     const data = await analyzeDocument({ image: req.file ?? null, text: req.body?.text }, deps);
+    res.json({ success: true, data });
+  });
+
+  app.post('/api/identify', parseUpload, async (req, res) => {
+    if (!deps.vision) throw new AnalyzeError('AI_PROCESSING_FAILED', { cause: new Error('no vision model wired') });
+    const data = await identifyPill({ image: req.file ?? null }, { vision: deps.vision });
     res.json({ success: true, data });
   });
 
