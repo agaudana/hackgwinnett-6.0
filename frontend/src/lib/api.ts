@@ -1,8 +1,8 @@
 import { buildMockResponse } from './mock';
 import type { ApiErrorBody, StudyPlanRequest, StudyPlanResponse } from './types';
 
-// Mock is ON unless NEXT_PUBLIC_USE_MOCK=false is set in frontend/.env.local
-export const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK !== 'false';
+// Mock is OFF by default. Set NEXT_PUBLIC_USE_MOCK=true only when you explicitly want sample data.
+export const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
 
 export class ApiError extends Error {
   code: string;
