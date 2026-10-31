@@ -65,7 +65,7 @@ async function sample(input: AnalyzeInput, signal: AbortSignal): Promise<Analyze
 async function callBackend(input: AnalyzeInput, signal: AbortSignal): Promise<AnalyzeResult> {
   const request: RequestInit =
     input.kind === 'image'
-      ? { method: 'POST', body: formFor(input.file), signal }
+      ? { method: 'POST', body: await formFor(input.file), signal }
       : {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -87,9 +87,13 @@ async function callBackend(input: AnalyzeInput, signal: AbortSignal): Promise<An
   return { ok: false, error: err?.message ? { code: String(err.code ?? 'UNKNOWN'), message: err.message } : NETWORK_ERROR }
 }
 
-function formFor(file: File) {
+// Server-side OCR time grows with pixel count; full-size phone photos were far too slow on a small
+// server. Documents keep more pixels than pills so small print stays readable.
+const MAX_DOCUMENT_SIDE = 2000
+
+async function formFor(file: File) {
   const form = new FormData()
-  form.append('image', file)
+  form.append('image', await shrinkForUpload(file, MAX_DOCUMENT_SIDE))
   form.append('inputType', 'image')
   return form
 }
@@ -127,10 +131,10 @@ const PILL_MESSAGES: Record<string, string> = {
 // Pills and labels stay readable at this size. Falls back to the original file if resizing fails.
 const MAX_UPLOAD_SIDE = 1600
 
-async function shrinkForUpload(file: File): Promise<File> {
+async function shrinkForUpload(file: File, maxSide = MAX_UPLOAD_SIDE): Promise<File> {
   try {
     const bitmap = await createImageBitmap(file)
-    const scale = Math.min(1, MAX_UPLOAD_SIDE / Math.max(bitmap.width, bitmap.height))
+    const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height))
     if (scale === 1 && file.size < 3 * 1024 * 1024) return file
     const canvas = document.createElement('canvas')
     canvas.width = Math.round(bitmap.width * scale)
