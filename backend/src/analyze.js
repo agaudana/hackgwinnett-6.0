@@ -169,10 +169,10 @@ function buildPrompt(documentText) {
 
 // --- untrusted model output -> Analysis ----------------------------------
 
-/** Tolerates ```json fences and prose around the object. */
+/** Tolerates ```json fences, prose around the object, and gpt-oss <reasoning> blocks (Bedrock). */
 function parseModelJson(raw) {
   if (typeof raw === 'string') {
-    const trimmed = raw.trim();
+    const trimmed = raw.replace(/<reasoning>[\s\S]*?<\/reasoning>/gi, '').trim();
     const unfenced = trimmed.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '');
     const braced = trimmed.slice(trimmed.indexOf('{'), trimmed.lastIndexOf('}') + 1);
     for (const candidate of [trimmed, unfenced, braced]) {

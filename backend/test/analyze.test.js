@@ -67,8 +67,12 @@ test('model errors or unusable output -> AI_PROCESSING_FAILED', async () => {
   }
 });
 
-test('JSON wrapped in fences or prose is recovered', async () => {
-  for (const raw of ['```json\n' + JSON.stringify(GOOD_REPLY) + '\n```', 'Sure! Here it is: ' + JSON.stringify(GOOD_REPLY) + ' Hope that helps.']) {
+test('JSON wrapped in fences, prose, or a gpt-oss <reasoning> block is recovered', async () => {
+  for (const raw of [
+    '```json\n' + JSON.stringify(GOOD_REPLY) + '\n```',
+    'Sure! Here it is: ' + JSON.stringify(GOOD_REPLY) + ' Hope that helps.',
+    '<reasoning>User wants JSON like {"ok":true}. No extra text.</reasoning>' + JSON.stringify(GOOD_REPLY),
+  ]) {
     const data = await analyzeDocument({ text: DOC }, { ocr: fakeOcr(''), ai: fakeModel(raw) });
     assert.equal(data.simplifiedText, GOOD_REPLY.simplifiedText);
   }

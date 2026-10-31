@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Camera, Info, Printer } from 'lucide-react'
 import { ActionList } from '../components/results/ActionList'
+import { CalendarExport } from '../components/results/CalendarExport'
 import { OriginalText } from '../components/results/OriginalText'
 import { SummaryCard } from '../components/results/SummaryCard'
 import { TermSheet } from '../components/results/TermSheet'
@@ -63,6 +64,7 @@ export function ResultsScreen({
           <Printer className="size-5" aria-hidden="true" />
           Print or save
         </button>
+        <CalendarExport actions={data.keyActions} />
       </div>
 
       <p className="reading text-center text-base text-muted-foreground">
