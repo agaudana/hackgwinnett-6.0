@@ -1,6 +1,6 @@
 # HealthLens API Contract
 
-**Version:** 1.0  
+**Version:** 1.1 (adds `POST /identify`; `/analyze` unchanged)  
 **Last Updated:** 2026-10-31  
 **Status:** APPROVED - Do not change without team coordination
 
@@ -183,6 +183,60 @@ All errors follow this structure:
   }
 }
 ```
+
+---
+
+## Endpoint: Identify Pill (v1.1)
+
+**Route:** `POST /identify`
+
+**Purpose:** Upload a photo of a loose pill or a prescription bottle, receive what the medicine is in plain language.
+Uses a vision model (Claude on Amazon Bedrock, Converse API). Same Bedrock key as `/analyze` by default.
+
+### Request Format
+```
+POST /api/identify
+Content-Type: multipart/form-data
+
+Field: "image" (file, required) - JPEG/PNG photo of a pill or medicine bottle, under 10MB
+```
+
+### Success Response (200 OK)
+```json
+{
+  "success": true,
+  "data": {
+    "identified": true,
+    "kind": "bottle",
+    "medicationName": "Metformin HCl",
+    "strength": "500 mg",
+    "purpose": "Metformin is usually used to help control blood sugar in people with type 2 diabetes.",
+    "howToTake": "Take 1 tablet by mouth 2 times a day with meals.",
+    "appearance": "A pharmacy label with black text on a white background.",
+    "imprint": "",
+    "warnings": ["May cause stomach upset.", "Avoid alcohol."],
+    "confidence": "high",
+    "summary": "This is metformin, 500 mg. It helps control blood sugar. Take 1 tablet 2 times a day with meals."
+  }
+}
+```
+
+**Field definitions:** every field is always present; unknown strings are `""`.
+- `identified`: `false` when the medicine could not be named. Then `medicationName`, `strength`, `purpose`, `howToTake` are `""` and `warnings` is `[]`.
+- `kind`: `"bottle"` (label visible), `"pill"` (loose pill), or `"unknown"` (not medicine / unclear).
+- `confidence`: `"high"` | `"medium"` | `"low"`. Server policy: a loose pill is never `"high"`; not identified is always `"low"`. Frontend should show medium/low as "possible match" / "not sure".
+- `howToTake`: only from directions printed on a visible label, never inferred.
+- `imprint`: letters/numbers stamped on the pill.
+- `summary`: always non-empty, one short sentence.
+- **Brevity (readers may have dyslexia):** every text field is one short phrase. Roughly: `medicationName` 1-2 words, `purpose` ≤6 words (the health problem only, e.g. "High blood sugar."), `howToTake` ≤10, `appearance` ≤8, `summary` ≤12, at most 2 `warnings` of ≤6 words each. Server caps lengths as a backstop.
+
+### Errors
+Same error body format and the same codes/messages as `/analyze`: `MISSING_INPUT` (400, no image),
+`INVALID_IMAGE` (400), `FILE_TOO_LARGE` (413), `AI_PROCESSING_FAILED` (500). The frontend may show
+pill-specific wording for `MISSING_INPUT` and `AI_PROCESSING_FAILED`.
+
+### Demo mode
+With `MOCK_AI=1` or no Bedrock key, returns a fixed lisinopril sample whose `summary` starts with `DEMO MODE:`.
 
 ---
 

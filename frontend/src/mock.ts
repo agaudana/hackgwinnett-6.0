@@ -1,5 +1,5 @@
 // Demo-mode response, copied from the success example in API_CONTRACT.md v1.0.
-import type { AnalysisData } from './types'
+import type { AnalysisData, PillData } from './types'
 
 export const SAMPLE_TEXT =
   'Patient should take amoxicillin 500mg PO BID with food. Monitor for fever >101°F. Return to ED if SOB worsens. Follow up with PCP in 7-10 days.'
@@ -25,4 +25,36 @@ export const MOCK_RESPONSE: { success: true; data: AnalysisData } = {
       { term: 'PCP', definition: 'Primary Care Provider - your regular doctor', category: 'provider' },
     ],
   },
+}
+
+// Demo-mode pill answer, matching the /identify example shape in API_CONTRACT.md v1.1.
+export const MOCK_PILL: PillData = {
+  kind: 'bottle',
+  medicationName: 'Lisinopril',
+  strength: '10 mg',
+  purpose: 'High blood pressure.',
+  howToTake: '1 pill every morning.',
+  appearance: 'Small pink round pill.',
+  imprint: '',
+  warnings: ['May make you dizzy.', 'Stand up slowly.'],
+  confidence: 'high',
+  identified: true,
+  summary: 'Lisinopril is for high blood pressure.',
+}
+
+// "Try an example pill": photo in public/samples, plus a matching answer in case the server is unreachable.
+export const EXAMPLE_PILL_URL = '/samples/images.jpeg'
+
+export const EXAMPLE_PILL: PillData = {
+  identified: true,
+  kind: 'pill',
+  medicationName: 'Biktarvy',
+  strength: '',
+  purpose: 'HIV infection.',
+  howToTake: '',
+  appearance: 'Brown-pink oval pill.',
+  imprint: 'GSI 9883',
+  warnings: [],
+  confidence: 'medium',
+  summary: 'The stamp matches Biktarvy, an HIV medicine.',
 }

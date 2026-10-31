@@ -73,3 +73,67 @@ export function createMockModel() {
     },
   };
 }
+
+// --- vision (pill identification) ----------------------------------------
+
+/** @typedef {import('./identify.js').VisionPort} VisionPort */
+
+/**
+ * Amazon Bedrock Converse API with a Bedrock API key (Bearer auth), for vision-capable
+ * models such as Claude. gpt-oss on Bedrock's OpenAI endpoint is text-only, hence a second adapter.
+ * @param {{ apiKey: string, runtimeURL: string, model: string, timeoutMs: number }} config
+ * @param {{ fetch?: typeof fetch }} [io] injectable for offline tests
+ * @returns {VisionPort}
+ */
+export function createBedrockVisionModel(config, io = {}) {
+  const doFetch = io.fetch ?? globalThis.fetch;
+  return {
+    mode: 'live',
+    async see({ system, user, image }) {
+      const res = await doFetch(`${config.runtimeURL}/model/${encodeURIComponent(config.model)}/converse`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${config.apiKey}` },
+        body: JSON.stringify({
+          system: [{ text: system }],
+          messages: [{
+            role: 'user',
+            content: [{ image: { format: image.format, source: { bytes: image.buffer.toString('base64') } } }, { text: user }],
+          }],
+          inferenceConfig: { maxTokens: 1200 },
+        }),
+        signal: AbortSignal.timeout(config.timeoutMs),
+      });
+      if (!res.ok) {
+        const detail = (await res.text().catch(() => '')).slice(0, 200);
+        throw new Error(`Vision HTTP ${res.status}: ${detail}`);
+      }
+      const json = await res.json();
+      const content = (json?.output?.message?.content ?? []).map((part) => part?.text ?? '').join('');
+      if (!content.trim()) throw new Error('Vision model returned no content');
+      return content;
+    },
+  };
+}
+
+const MOCK_PILL_REPLY = Object.freeze({
+  kind: 'bottle',
+  medicationName: 'Lisinopril',
+  strength: '10 mg',
+  purpose: 'High blood pressure.',
+  howToTake: '1 pill every morning.',
+  appearance: 'Small pink round pill.',
+  imprint: '',
+  warnings: ['May make you dizzy.', 'Stand up slowly.'],
+  confidence: 'high',
+  summary: 'DEMO MODE: sample answer, not from your photo. Lisinopril is for high blood pressure.',
+});
+
+/** @returns {VisionPort} */
+export function createMockVisionModel() {
+  return {
+    mode: 'mock',
+    async see() {
+      return JSON.stringify(MOCK_PILL_REPLY);
+    },
+  };
+}
