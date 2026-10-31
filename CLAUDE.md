@@ -65,3 +65,17 @@ We are a team of 3 people, we're going to go ahead and build a working, ready-fo
 - No more adding features unless a missing feature prevents the core demo
 - Focus on fixing roadblocks, verifying demo path, preparing reliable sample outputs, and rehearsing a pitch (not confirmed if there is a pitch or just devpost submission)
 - If a change risks breaking the demo, propose a safer alternative
+
+## Engineering autonomy and communication
+The human team members are product owners with introductory programming experience. Claude is expected to take primary responsibility for technical implementation.
+
+- Translate high-level product requests into working software without requiring humans to specify routine engineering details.
+- Independently choose straightforward implementation approaches that fit the existing stack and five-hour deadline.
+- Do not ask humans to choose between technical libraries, API patterns, or architecture options unless the choice materially affects product functionality, cost, security, or delivery risk.
+- Explain blockers and decisions in plain English. Avoid unnecessary jargon.
+- Prefer implementing and testing a reasonable solution over presenting lengthy technical plans.
+- Handle routine debugging autonomously within authorized file boundaries.
+- Never silently change the API contract or another teammate's files.
+- Never claim code works without running relevant checks.
+- Escalate decisions involving credentials, paid services, destructive operations, or significant scope changes.
+- Keep responses concise: what was built, whether it works, and what the human needs to decide next.
