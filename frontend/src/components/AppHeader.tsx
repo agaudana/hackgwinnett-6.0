@@ -1,18 +1,15 @@
 import { useRef } from 'react'
-import { HeartPulse, Settings2 } from 'lucide-react'
+import { Settings2 } from 'lucide-react'
+import { usePreferences } from '../lib/preferences'
 import { ReadingSettings } from './ReadingSettings'
 
 export function AppHeader({ onHome }: { onHome?: () => void }) {
   const dialogRef = useRef<HTMLDialogElement>(null)
 
-  const brand = (
-    <span className="flex items-center gap-2">
-      <span className="flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-        <HeartPulse className="size-6" aria-hidden="true" />
-      </span>
-      <span className="text-xl font-bold tracking-tight">HealthLens</span>
-    </span>
-  )
+  const { prefs } = usePreferences()
+  const logo = prefs.theme === 'dark' ? '/logo/logo-horizontal-dark.svg' : '/logo/logo-horizontal.svg'
+
+  const brand = <img src={logo} alt="HealthLens" className="h-10 w-auto md:h-12" />
 
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur">
