@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthLens - Results</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Atkinson Hyperlegible', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f1f5f9;
+            min-height: 100vh;
+            color: #1e293b;
+        }
+
+        .header {
+            background: #0891B2;
+            background-image:
+                radial-gradient(at 20% 0%, rgba(102, 126, 234, 0.2) 0px, transparent 50%),
+                radial-gradient(at 80% 0%, rgba(5, 150, 105, 0.2) 0px, transparent 50%);
+            padding: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .back-button {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .back-button:focus {
+            outline: 3px solid white;
+            outline-offset: 2px;
+        }
+
+        .back-button svg {
+            width: 24px;
+            height: 24px;
+            stroke: white;
+            stroke-width: 2.5;
+        }
+
+        .tts-button {
+            width: 56px;
+            height: 56px;
+            background: white;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .tts-button:hover {
+            transform: scale(1.08);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .tts-button:focus {
+            outline: 3px solid white;
+            outline-offset: 2px;
+        }
+
+        .tts-button svg {
+            width: 28px;
+            height: 28px;
+            stroke: #0891B2;
+            stroke-width: 2.5;
+        }
+
+        .main-content {
+            padding: 32px 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .title-section {
+            background: white;
+            border-radius: 20px;
+            padding: 28px;
+            margin-bottom: 24px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #0f172a;
+        }
+
+        .page-subtitle {
+            font-size: 17px;
+            color: #64748b;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #0891B2;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .actions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .action-card {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            border: 2px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .action-card.critical {
+            border-left-width: 6px;
+            border-left-color: #ef4444;
+        }
+
+        .action-card.important {
+            border-left-width: 6px;
+            border-left-color: #f59e0b;
+        }
+
+        .action-card.normal {
+            border-left-width: 6px;
+            border-left-color: #10b981;
+        }
+
+        .action-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+            border-color: #cbd5e1;
+        }
+
+        .action-card:focus {
+            outline: 3px solid #0891B2;
+            outline-offset: 2px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            position: relative;
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .critical .card-icon {
+            background: linear-gradient(135deg, #fecaca, #fca5a5);
+        }
+
+        .important .card-icon {
+            background: linear-gradient(135deg, #fed7aa, #fdba74);
+        }
+
+        .normal .card-icon {
+            background: linear-gradient(135deg, #a7f3d0, #6ee7b7);
+        }
+
+        .card-icon svg {
+            width: 26px;
+            height: 26px;
+        }
+
+        .critical .card-icon svg { stroke: #dc2626; stroke-width: 2.5; }
+        .important .card-icon svg { stroke: #d97706; stroke-width: 2.5; }
+        .normal .card-icon svg { stroke: #059669; stroke-width: 2.5; }
+
+        .card-content {
+            flex: 1;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 1.3;
+            margin-bottom: 8px;
+            color: #0f172a;
+        }
+
+        .card-detail {
+            font-size: 16px;
+            color: #64748b;
+            line-height: 1.5;
+        }
+
+        .priority-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 6px 12px;
+            border-radius: 0 18px 0 12px;
+        }
+
+        .critical .priority-badge {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .important .priority-badge {
+            background: #fffbeb;
+            color: #d97706;
+        }
+
+        .normal .priority-badge {
+            background: #f0fdf4;
+            color: #059669;
+        }
+
+        .section-header {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 16px;
+            padding-left: 4px;
+        }
+
+        .secondary-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .secondary-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .secondary-card:hover {
+            border-color: #0891B2;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+        }
+
+        .secondary-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #bae6fd, #7dd3fc);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .secondary-icon svg {
+            width: 24px;
+            height: 24px;
+            stroke: #0891B2;
+            stroke-width: 2.5;
+        }
+
+        .secondary-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <button class="back-button" aria-label="Go back">
+            <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+        </button>
+        <button class="tts-button" aria-label="Read all instructions aloud">
+            <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+            </svg>
+        </button>
+    </div>
+
+    <div class="main-content">
+        <div class="title-section">
+            <h1 class="page-title">Your Care Instructions</h1>
+            <p class="page-subtitle">We found 4 important actions from your document</p>
+        </div>
+
+        <div class="summary-stats">
+            <div class="stat-card">
+                <div class="stat-value">2</div>
+                <div class="stat-label">Critical</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">1</div>
+                <div class="stat-label">Important</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">1</div>
+                <div class="stat-label">Routine</div>
+            </div>
+        </div>
+
+        <div class="actions-list">
+            <div class="action-card critical" tabindex="0" role="button" aria-label="Critical: Take amoxicillin twice daily with food">
+                <span class="priority-badge">Critical</span>
+                <div class="card-header">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="9" y1="9" x2="15" y2="15"></line>
+                            <line x1="15" y1="9" x2="9" y2="15"></line>
+                        </svg>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-title">Take amoxicillin twice daily with food</div>
+                        <div class="card-detail">Morning and evening, 500mg each time</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-card important" tabindex="0" role="button" aria-label="Important: Watch for fever above 101°F">
+                <span class="priority-badge">Important</span>
+                <div class="card-header">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-title">Watch for fever above 101°F</div>
+                        <div class="card-detail">Check your temperature if you feel warm</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-card critical" tabindex="0" role="button" aria-label="Critical: Return to ER if breathing worsens">
+                <span class="priority-badge">Critical</span>
+                <div class="card-header">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                            <line x1="12" y1="9" x2="12" y2="13"></line>
+                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                        </svg>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-title">Return to ER if breathing worsens</div>
+                        <div class="card-detail">Don't wait—go immediately if you struggle to breathe</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-card normal" tabindex="0" role="button" aria-label="Routine: Schedule follow-up in 7-10 days">
+                <span class="priority-badge">Routine</span>
+                <div class="card-header">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-title">Schedule follow-up in 7-10 days</div>
+                        <div class="card-detail">Call your regular doctor to book appointment</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="section-header">More Options</h2>
+        <div class="secondary-actions">
+            <button class="secondary-card" aria-label="View original document text">
+                <div class="secondary-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                    </svg>
+                </div>
+                <div class="secondary-text">Original Document</div>
+            </button>
+
+            <button class="secondary-card" aria-label="Learn about medical terms">
+                <div class="secondary-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                </div>
+                <div class="secondary-text">Explain Terms</div>
+            </button>
+        </div>
+    </div>
+</body>
+</html>
