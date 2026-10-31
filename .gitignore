@@ -1,3 +1,4 @@
 .claude/plugins/**/.git/
 .claude/plugins/**/.git
 .claude/plugins/**/.gitmodules
+backend/.env
