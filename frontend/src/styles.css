@@ -1,3 +1,20 @@
+@font-face {
+  font-family: 'OpenDyslexic';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  size-adjust: 85%;
+  src: url('../node_modules/@fontsource/opendyslexic/files/opendyslexic-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'OpenDyslexic';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 700;
+  size-adjust: 85%;
+  src: url('../node_modules/@fontsource/opendyslexic/files/opendyslexic-latin-700-normal.woff2') format('woff2');
+}
+
 :root {
   --bg: #fff7d1;
   --card: #fffdf2;
@@ -15,6 +32,9 @@
   --on-ink: #ffffff;
   --amber-ink: #111111;
   --error-bg: #fde2e4;
+  --wide-leading: 2;
+  --wide-tracking: 0.1em;
+  --wide-word-gap: 0.4em;
   --leading: 1.45;
   --tracking: normal;
   --word-gap: normal;
@@ -159,7 +179,7 @@ html[data-theme='dark'] {
 html[data-theme='dark'] .flag-critical { color: #141414; }
 html[data-size='lg'] { font-size: 23px; }
 html[data-size='xl'] { font-size: 26px; }
-html[data-spacing='wide'] { --leading: 1.8; --tracking: 0.03em; --word-gap: 0.14em; }
+html[data-spacing='wide'] { --leading: var(--wide-leading); --tracking: var(--wide-tracking); --word-gap: var(--wide-word-gap); }
 
 .btn-icon { min-height: 48px; width: 48px; padding: 0; flex: none; border-radius: 14px; }
 .btn-done { background: var(--ink); color: var(--on-ink); }
@@ -187,6 +207,8 @@ html[data-spacing='wide'] { --leading: 1.8; --tracking: 0.03em; --word-gap: 0.14
 .choice legend { font-weight: 700; padding: 0; margin-bottom: 8px; }
 .choice-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 6.5em), 1fr)); gap: 8px; }
 .choice-option { min-height: 52px; display: flex; align-items: center; justify-content: center; border: var(--border); border-radius: 14px; background: var(--field); font-weight: 700; cursor: pointer; text-align: center; padding: 6px; }
+.choice-sample { display: block; margin-top: 4px; font-weight: 400; text-align: center; }
+.choice-look { display: block; width: 100%; padding: 4px 6px; border-radius: 8px; }
 .choice-option:has(input:checked) { background: var(--ink); color: var(--on-ink); }
 .choice-option:has(input:focus-visible) { outline: 4px solid var(--blue); outline-offset: 3px; }
 
@@ -213,3 +235,8 @@ html[data-spacing='wide'] { --leading: 1.8; --tracking: 0.03em; --word-gap: 0.14
   .settings-button { width: 44px; padding: 0; }
   .settings-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 }
+
+.how-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.how-item { display: flex; gap: 14px; align-items: flex-start; }
+.how-item p { margin: 4px 0 0; }
+.how-icon { width: 36px; height: 36px; flex: none; }

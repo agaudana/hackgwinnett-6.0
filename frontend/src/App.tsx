@@ -6,6 +6,7 @@ import LoadingScreen from './LoadingScreen'
 import ResultsScreen from './ResultsScreen'
 import ErrorScreen from './ErrorScreen'
 import SettingsDialog from './SettingsDialog'
+import Onboarding, { hasOnboarded, markOnboarded } from './Onboarding'
 import ReadingRuler from './ReadingRuler'
 import Icon from './Icon'
 import type { AnalysisData, AnalyzeInput, ApiError, ResultSource } from './types'
@@ -41,6 +42,7 @@ export default function App() {
   const [state, dispatch] = useReducer(reducer, initial)
   const [demo, setDemo] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [onboarding, setOnboarding] = useState(() => !hasOnboarded())
   const { prefs, update, reset: resetPrefs } = usePreferences()
   const inFlight = useRef<AbortController | null>(null)
 
@@ -78,6 +80,9 @@ export default function App() {
         </button>
         <div className="topbar-right">
           {demo && <span className="demo-badge">Demo mode</span>}
+          <button className="btn btn-outline btn-small settings-button" onClick={() => setOnboarding(true)}>
+            <Icon name="info" /> <span className="settings-label">How it works</span>
+          </button>
           <button className="btn btn-outline btn-small settings-button" onClick={() => setSettingsOpen(true)}>
             <Icon name="sliders" /> <span className="settings-label">Reading settings</span>
           </button>
@@ -85,12 +90,22 @@ export default function App() {
       </header>
 
       <main className="screen">
-        {state.status === 'idle' && <UploadScreen onSubmit={submit} />}
-        {state.status === 'loading' && <LoadingScreen input={state.input} onCancel={reset} />}
-        {state.status === 'result' && (
+        {onboarding && (
+          <Onboarding
+            prefs={prefs}
+            onChange={update}
+            onFinish={() => {
+              markOnboarded()
+              setOnboarding(false)
+            }}
+          />
+        )}
+        {!onboarding && state.status === 'idle' && <UploadScreen onSubmit={submit} />}
+        {!onboarding && state.status === 'loading' && <LoadingScreen input={state.input} onCancel={reset} />}
+        {!onboarding && state.status === 'result' && (
           <ResultsScreen data={state.data} source={state.source} speechRate={prefs.speechRate} onReset={reset} />
         )}
-        {state.status === 'error' && (
+        {!onboarding && state.status === 'error' && (
           <ErrorScreen error={state.error} onRetry={() => submit(state.input)} onReset={reset} />
         )}
       </main>
