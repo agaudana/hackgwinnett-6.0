@@ -25,7 +25,7 @@ test('openai adapter sends chat completion request and returns content', async (
   const sent = JSON.parse(init.body);
   assert.equal(sent.model, 'gpt-4o');
   assert.deepEqual(sent.messages, [{ role: 'system', content: 'S' }, { role: 'user', content: 'U' }]);
-  assert.deepEqual(sent.response_format, { type: 'json_object' });
+  assert.equal(sent.response_format, undefined); // breaks Bedrock gpt-oss output
 });
 
 test('openai adapter throws on HTTP error or empty content, without the key in the message', async () => {
