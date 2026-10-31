@@ -45,6 +45,8 @@ We are a team of 3 people, we're going to go ahead and build a working, ready-fo
 - Use environment variables and .env.example with placeholders only. Never commit real .env files.
 - Do not introduce a second AI provider or paid external service without explicit team apporval
 - Make AI dependent features easy to demo with clearly labeled mock/test responses if access is unavailable
+- Superpowers (optional): You may recommend relevant Superpowers skills or workflows when they would meaningfully improve debugging, verification, or implementation quality. However, NEVER invoke Superpowers commands, skills, or workflows automatically. Explain the expected benefit and ask for explicit user approval before using one. Prioritize speed and avoid heavyweight planning processes during the five-hour hackathon.
+- PStack (optional): You may recommend relevant PStack skills when they would materially improve debugging, architecture, integration, or verification. Never automatically invoke PStack workflows or subagents. Explain why a particular skill would help and allow a teammate to decide whether to run it manually. Avoid heavyweight multi-agent workflows during the five-hour sprint.
 
 **How to work on a task**
 1. Read relevant files and API_CONTRACT.md if it exists. Resspect file ownership.
