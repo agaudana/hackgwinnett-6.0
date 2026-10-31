@@ -213,3 +213,8 @@ html[data-spacing='wide'] { --leading: 1.8; --tracking: 0.03em; --word-gap: 0.14
   .settings-button { width: 44px; padding: 0; }
   .settings-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 }
+
+.how-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.how-item { display: flex; gap: 14px; align-items: flex-start; }
+.how-item p { margin: 4px 0 0; }
+.how-icon { width: 36px; height: 36px; flex: none; }
