@@ -8,6 +8,10 @@ const MOCK_MODE: MockMode =
 
 export const ALWAYS_MOCK = MOCK_MODE === 'always'
 
+// Where the backend lives. Empty in dev (Vite proxies /api). In production, set at build time to the
+// backend's public URL, e.g. https://healthlens-api.onrender.com
+const API_BASE = (import.meta.env.VITE_API_BASE ?? '').replace(/\/+$/, '')
+
 const MAX_BYTES = 10 * 1024 * 1024
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png']
 
@@ -71,7 +75,7 @@ async function callBackend(input: AnalyzeInput, signal: AbortSignal): Promise<An
 
   let body: { success?: unknown; data?: unknown; error?: Partial<ApiError> }
   try {
-    const res = await fetch('/api/analyze', request)
+    const res = await fetch(`${API_BASE}/api/analyze`, request)
     body = await res.json()
   } catch (error) {
     if (error instanceof DOMException && error.name === 'AbortError') throw error
@@ -103,7 +107,7 @@ export async function analyze(input: AnalyzeInput, signal: AbortSignal): Promise
 export async function backendIsDemo(): Promise<boolean> {
   if (MOCK_MODE === 'always') return true
   try {
-    const res = await fetch('/api/health')
+    const res = await fetch(`${API_BASE}/api/health`)
     const health = await res.json()
     return health?.services?.ai === 'mock'
   } catch {
@@ -151,7 +155,7 @@ async function callIdentify(input: PillInput, signal: AbortSignal): Promise<Iden
 
   let body: { success?: unknown; data?: unknown; error?: Partial<ApiError> }
   try {
-    const res = await fetch('/api/identify', { method: 'POST', body: form, signal })
+    const res = await fetch(`${API_BASE}/api/identify`, { method: 'POST', body: form, signal })
     body = await res.json()
   } catch (error) {
     if (error instanceof DOMException && error.name === 'AbortError') throw error

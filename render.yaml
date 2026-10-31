@@ -1,0 +1,45 @@
+# Render Blueprint: deploys the backend (web service) and frontend (static site) from this repo.
+# Render dashboard -> New -> Blueprint -> pick this repo. It will ask for OPENAI_API_KEY (never commit it).
+#
+# If Render gives either service a different URL than the names below (name already taken),
+# update CORS_ORIGIN and VITE_API_BASE to the real URLs, then redeploy both.
+services:
+  - type: web
+    name: healthlens-api
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: OPENAI_API_KEY # Bedrock API key; also used for pill vision (Converse API)
+        sync: false
+      - key: OPENAI_BASE_URL
+        value: https://bedrock-runtime.us-east-1.amazonaws.com/openai/v1
+      - key: OPENAI_MODEL
+        value: openai.gpt-oss-120b-1:0
+      - key: VISION_MODEL
+        value: us.anthropic.claude-sonnet-5-5
+      - key: CORS_ORIGIN
+        value: https://healthlens.onrender.com
+      - key: MOCK_AI # set to 1 to force labeled demo answers if Bedrock flakes on stage
+        value: ""
+
+  - type: web
+    name: healthlens
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: VITE_API_BASE
+        value: https://healthlens-api.onrender.com
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
